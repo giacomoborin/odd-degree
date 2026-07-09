@@ -80,6 +80,17 @@ def minima(I, normalize=1):
     return (minima, OLminima, ORminima, inner_products)
 
 
+def minima_eichler(I, normalize=1):
+    basis = I.reduced_basis()
+    minima = sorted([g.reduced_norm() / I.norm() / normalize**(1/2) for g in basis])
+    OL = I.left_order()
+    E = I.left_order().intersection(I.right_order())
+    Eichler_basis = (E * 1).reduced_basis()
+    Eichler_minima = sorted([g.reduced_norm() / normalize**(2) for g in Eichler_basis])[1:]
+    return (minima, Eichler_minima)
+
+
+
 def sample_odd_element(I, normalize=1):
     basis = I.reduced_basis()
     odd_samples = 0.0
@@ -100,7 +111,8 @@ def sample_odd_element(I, normalize=1):
 if __name__ == '__main__':
     # args are either a prime characteristic,
     # or the serialization of a maximal order
-    SAVE_OUT = False
+    SAVE_OUT = True
+    mode = ''
     try:
         p = int(sys.argv[1])
         if p == 248:
@@ -109,8 +121,13 @@ if __name__ == '__main__':
             p = 55340232221128654847
         if len(sys.argv) > 2 and sys.argv[2] == '--random':
             O = random_order(p)
+            mode = 'random'
         elif len(sys.argv) > 2 and sys.argv[2] == '--birandom':
             O = None
+            mode = 'birandom'
+        elif len(sys.argv) > 2 and sys.argv[2] == '--eichler':
+            O = None
+            mode = 'eichler'
         else:
             O = start_order(p)
     except ValueError:
@@ -123,6 +140,13 @@ if __name__ == '__main__':
     # their right orders, scaled down by factors of p^½ and p^⅔
     # respectively
     # number_true_ch = 0
+    if mode == 'eichler':
+        for n,I in enumerate(random_ideals(O, p = p)):
+            m, OLm  = minima_eichler(I, p)
+            s = ','.join(f'{float(m):17.15f}' for m in m + OLm)
+            if SAVE_OUT:
+                print(s, flush=True)
+
     try:
         for n,I in enumerate(random_ideals(O, p = p)):
             m, OLm, ORm, inner = minima(I, p)
@@ -135,12 +159,8 @@ if __name__ == '__main__':
             # if ch:
             #     number_true_ch += 1
             sample_size += 1
-            reps = sample_odd_element(I, p)
             if SAVE_OUT:
                 print(s, flush=True)
-                print(f'sample {n} reps {reps}', file=sys.stderr)
-            if reps < 0.3:
-                print(f'sample {n} reps {reps}', file=sys.stderr)
     except KeyboardInterrupt:
         print(f'{sample_size} samples collected', file=sys.stderr)
         for i in range(4):

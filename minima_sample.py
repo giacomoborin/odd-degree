@@ -53,20 +53,33 @@ def random_ideals(p):
 
 def main(p, howmany=None, output=None):
     from datetime import datetime
-    from itertools import islice
     from tqdm import tqdm
 
     if howmany is None:
         howmany = 10
-    records = list(tqdm(
-        islice(random_ideals(p), howmany),
-        total=howmany,
-        desc='Collecting',
-        unit='record',
-    ))
     if output is None:
         timestamp = datetime.now().strftime('%Y%m%d-%H%M%S')
         output = f'data/{p}-birandom-{timestamp}.csv'
+
+    records = []
+    interrupted = False
+    try:
+        with tqdm(total=howmany, desc='Collecting', unit='record') as progress:
+            for record in random_ideals(p):
+                records.append(record)
+                progress.update()
+                if len(records) >= howmany:
+                    break
+    except KeyboardInterrupt:
+        interrupted = True
+        print(f'\ninterrupted; saving {len(records)} records collected so far')
+
+    save_records(p, output, records)
+    if interrupted:
+        raise SystemExit(130)
+
+
+def save_records(p, output, records):
     with open(output, 'w', newline='') as f:
         prime = PRIME_ALIASES.get(p, p)
         f.write(f'# prime={prime}; columns={",".join(COLUMNS)}\n')

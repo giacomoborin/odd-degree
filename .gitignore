@@ -1,1 +1,13 @@
 *.pdf
+*.aux
+*.bbl
+*.bib
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+report/cryptobib-update.sh
+report/cryptobib/abbrev3.bib
+report/cryptobib/crypto.bib

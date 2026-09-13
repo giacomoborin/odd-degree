@@ -1,0 +1,55 @@
+%% Style for security proofs ``a la Shoup''
+%% Original version: Emmanuel Bresson
+%% Revisions - David Pointcheval:
+%% v1: december 2002
+%% v2: march 2003
+%% v3: april 2013
+%% v4: april 2013 (Fabrice Benhamouda - use enumitem to properly align text)
+%% v4.1: july 2013 (Fabrice Benhamouda - transform into a real package)
+%% v5: october 2025 (Giacomo Borin - add xspace for better spacing after commands)
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{games}
+  [2013/07/05 v4.1 LaTeX for style for security proofs ``a la Shoup'']
+
+\makeatletter
+\RequirePackage{enumitem}%
+\@ifpackagelater{enumitem}{2011/09/28}{%
+    % Package is new enough
+}{%
+    \PackageError{games}{enumitem is too old}%
+}
+\makeatother
+
+\newcommand{\bG}{\textbf{G}}
+\newcommand{\bE}{\textbf{E}}
+
+\newlist{games}{enumerate}{1}
+\setlist[games]{
+  label=\textbf{Game $\bG_{\arabic*}$:},
+  ref=\arabic*,
+  align=left,
+  itemindent=*,
+  widest=99,
+  start=0
+}
+
+\newlist{experiments}{enumerate}{1}
+\setlist[experiments]{
+  label=\textbf{Experiment $\bE_{\arabic*}$:},
+  ref=\arabic*,
+  align=left,
+  itemindent=*,
+  widest=99,
+  start=0
+}
+
+\newcommand{\game}[1]{\item\label{G:#1}}
+\newcommand{\expe}[1]{\item\label{G:#1}}
+
+\newcommand{\previousgamesi}{\addtocounter{gamesi}{-1}\arabic{gamesi}\addtocounter{gamesi}{1}}
+\newcommand{\printgameM}[1]{\ensuremath{{\bG_{\ref{G:#1}}}}\xspace}
+\newcommand{\printgame}[1] {\ensuremath{{\bG_{\ref{G:#1}}}}\xspace}
+\newcommand{\thisgame}     {\ensuremath{\bG_{\arabic{gamesi}}}\xspace}
+\newcommand{\previousgame} {\ensuremath{\bG_{\previousgamesi}}\xspace}
+\endinput

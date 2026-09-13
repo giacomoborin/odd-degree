@@ -1,0 +1,105 @@
+# Latexmk configuration file, 
+# Author: Ryan Rueger (gently borrowed).
+# Date: 2025-12-03
+# Different compilation engines
+#  - 1: pdflatex
+#  - 4: lualatex (Required if using non-standard fonts)
+#  - 5: xelatex (Unmaintained?)
+$pdf_mode = 1;
+
+# Execute hooks file before compilation, if it exists
+# Hooks file should be a shell script with same basename and .hooks extension
+# e.g.
+# $ ls
+#   my-document.tex      <- main tex file
+#   my-document.hooks    <- shell script
+# The shell script is called with two arguments
+#   1. The string "--pre" or "--post" depending on whether the hooks file is
+#      called before, or after compilation
+#   2. The basename of the main document
+#      (e.g. 'my-document' if the main file is 'my-document.tex')
+
+# Hooks Script Template {{{{{
+# Here is a hooks template
+#
+# | #!/bin/bash
+# |
+# | case $1 in
+# |   --pre) pre=true; shift ;;
+# |   --post) post=true; shift ;;
+# | esac
+# | document=$1
+# |
+# | if [[ $pre == true ]]
+# | then
+# |   # Do stuff with "$document"...
+# | fi
+# |
+# | if [[ $post == true ]]
+# | then
+# |   # Do stuff with "$document"...
+# |   # e.g. crop margins of pdf for easier reading
+# |   # pdfcropmargins -usp 25 --modifyOriginal "$document.pdf"
+# |   # pdfcropmargins -usp 25 --modifyOriginal ".latexmk.aux/$document.pdf"
+# | fi
+# }}}}}
+
+$compiling_cmd = "test -f %R.hooks && bash %R.hooks --pre %R";
+
+# Do not litter auxiliary files everywhere
+#
+# 1. cd to source file first
+$do_cd = 1;
+
+# 2. Put all auxiliary files in .latexmk.aux
+$out_dir = ".latexmk.aux";
+
+# 3. Copy the pdf from .latexmk.aux into the source directory when finished
+$success_cmd = "cp %Z/%R.pdf .; test -f %R.hooks && bash %R.hooks --post %R";
+
+# 4. Add the copied pdf from success_cmd to the list of files that need to be
+#    deleted on a clean (`latexmk -C`) operation
+#    (Paths are relative to $out_dir)
+#    (I sometimes use the amsref package which creates .brf files)
+$clean_ext = "%R.brf";
+$clean_full_ext = "../%R.pdf";
+
+# Resultig directory structure {{{{{
+# These 4 options result in a clean directory structure
+#
+# Before compilation
+#
+# ./
+#   source.tex
+#
+# After compilation
+#
+# ./
+#   source.tex
+#   source.pdf
+#   .latexmk.aux/
+#      source.idx
+#      source.toc
+#      source.out
+#      source.pdf
+#      ...
+#
+# After `latexmk -C` full clean (including pdfs)
+#
+# ./
+#   source.tex
+#   .latexmk.aux/
+#     (empty)
+# }}}}}
+
+# Use `texfot` for processing logs of *latex to only show interesting messages
+# ...but be defensive: if texfot is not installed, just run *latex alone
+# (Apparently we need to escape '$'s in this string)
+# $lualatex = "bash -c 'tf() { command -v texfot && texfot \$@ || \$@ ;}; tf lualatex --shell-escape %O %S'";
+# $pdflatex = "bash -c 'tf() { command -v texfot && texfot \$@ || \$@ ;}; tf pdflatex --shell-escape %O %S'";
+# $xelatex  = "bash -c 'tf() { command -v texfot && texfot \$@ || \$@ ;}; tf xelatex --shell-escape %O %S'";
+
+# Uncomment these, if you want to see all errors
+$lualatex = "lualatex --shell-escape %O %S";
+$pdflatex = "pdflatex --shell-escape %O %S";
+$xelatex  = "xelatex --shell-escape %O %S";

@@ -1,0 +1,318 @@
+% Comments
+% \newcommand{\AL}[1]{\textcolor{new green}{Antonin:#1}}
+% \newcommand{\AB}[1]{\textcolor{red}{#1}}
+% \newcommand{\PAD}[1]{\textcolor{blue}{Pierrick: #1}}
+% \newcommand{\MCRS}[1]{\textcolor{red}{Maria: #1}}
+% \newcommand{\marzio}[1]{\textcolor{violet}{Marzio: #1}}
+% \newcommand{\ric}[1]{\textcolor{orange}{Riccardo #1}}
+% \newcommand{\BF}[1]{\textcolor{magenta}{Boris: #1}}
+% \newcommand{\lrnz}[1]{\textcolor{cyan}{Lorenz: #1}}
+% \newcommand{\MaxD}[1]{\textcolor{olive}{Max: #1}}
+% \newcommand{\aw}[1]{\textcolor{clr}{Alex: #1}}
+
+\newcommand{\AL}[1]{}
+\newcommand{\AB}[1]{}
+\newcommand{\PAD}[1]{}
+\newcommand{\MCRS}[1]{}
+\newcommand{\marzio}[1]{}
+\newcommand{\ric}[1]{}
+\newcommand{\BF}[1]{}
+\newcommand{\lrnz}[1]{}
+\newcommand{\MaxD}[1]{}
+\newcommand{\aw}[1]{}
+
+\newcommand{\jump}{\vspace{12pt}}
+\renewcommand{\phi}{\varphi}
+
+%for booleans true and false in algorithms
+\newcommand{\btrue}{{\texttt{true}}\xspace}
+\newcommand{\bfalse}{\texttt{false}\xspace}
+
+%for keywords and, or, not, etc. in algorithms
+\newcommand{\AND}{\textbf{and}\xspace}
+\newcommand{\OR}{\textbf{or}\xspace}
+\newcommand{\NOT}{\textbf{not}\xspace}
+
+% Definitions specific to this paper only
+
+\newcommand{\inter}[1]{\stackrel{\circ}{#1}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\slice}[2]{[#1 \mathinner {\ldotp \ldotp} #2[}
+\newcommand{\abcd}[4]{\left(
+        \begin{smallmatrix}#1&#2\\#3&#4\end{smallmatrix}\right)}
+\newcommand{\mtwo}[4]{\left(
+        \begin{matrix}#1&#2\\#3&#4
+        \end{matrix}\right)}
+\newcommand{\vtwo}[2]{\left(
+        \begin{matrix}#1\\#2
+        \end{matrix}\right)}
+\newcommand{\round}[1]{\left\lfloor #1\right\rceil}
+\newcommand{\floor}[1]{\left\lfloor #1\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil #1\right\rceil}
+\newcommand{\upto}[3]{#1 \text{ \bf from } #2 \text{ \bf up to }#3}
+\newcommand{\downto}[3]{#1 \text{ \bf from } #2 \text{ \bf down to }#3}
+
+% Quaternion things
+\renewcommand{\vec}{\mathbf}
+\newcommand{\veca}{\vec{a}}
+\newcommand{\vecb}{\vec{b}}
+\DeclareMathOperator{\vol}{vol}
+\newcommand{\Deuring}{\Delta}
+
+\newcommand{\sqisign}{\textsc{SQIsign}\xspace}
+\newcommand{\SQI}{\sqisign}
+\newcommand\sqrtvelu{\mbox{\smash{\hspace{-1pt}\raisebox{.01ex}{$\sqrt{\text{élu}}$}}}}
+
+\DeclareMathOperator{\eps}{\varepsilon}
+\DeclareMathOperator{\Q}{\mathbb{Q}}
+\DeclareMathOperator{\R}{\mathbb{R}}
+\DeclareMathOperator{\C}{\mathbb{C}}
+\DeclareMathOperator{\Z}{\mathbb{Z}}
+\DeclareMathOperator{\F}{\mathbb{F}}
+
+\newcommand{\counter}{\texttt{counter}}
+\newcommand{\bound}{\texttt{bound}}
+
+% costs
+\newcommand{\Add}{\mathbf{a}}
+\newcommand{\Mult}{\mathbf{M}}
+\newcommand{\Sq}{\mathbf{S}}
+\newcommand{\Inv}{\mathbf{I}}
+\newcommand{\Neg}{\mathbf{n}}
+\newcommand{\MultByI}{\mathbf{i}}
+
+\DeclareMathOperator{\Qp}{\Q_p}
+\DeclareMathOperator{\Ql}{\Q_{\ell}}
+\newcommand{\ZZ}{\Z}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\MM}{\mathbb{M}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\Fp}{\F_p}
+\newcommand{\Fpbar}{\overbar{\F}_p}
+
+\newcommand{\Fpsq}{\F_{p^2}}
+\newcommand{\Fpp}{\Fpsq}
+\newcommand{\Fq}{\F_q}
+\newcommand{\fpi}{\mathsf{i}} % todo: rollback to normal i
+\DeclareMathOperator{\A}{\mathbb{A}}
+\newcommand{\Bpoo}{\ensuremath{B_{p,\infty}}}
+\newcommand{\QA}{\Bpoo}
+
+\renewcommand{\P}{\mathbb{P}}
+\renewcommand{\O}{\mathcal{O}}
+\newcommand{\ecinf}{0}
+
+% Generators of Bpoo
+\renewcommand{\i}{\mathbf{i}}
+\renewcommand{\j}{\mathbf{j}}
+\renewcommand{\k}{\mathbf{k}}
+
+% Math operator declarations
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\nred}{nrd}
+\newcommand{\norm}[1]{\nred(#1)}
+\def\nrd{\norm}
+\DeclareMathOperator{\Aut}{Aut}
+\DeclareMathOperator{\Ver}{Ver}
+\DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\Sp}{Sp}
+\DeclareMathOperator{\U}{U}
+\DeclareMathOperator{\Hom}{Hom}
+\DeclareMathOperator{\Div}{Div}
+\DeclareMathOperator{\poly}{poly}
+\DeclareMathOperator{\cha}{char}
+\DeclareMathOperator{\End}{End}
+\DeclareMathOperator{\idealclass}{cls}
+\newcommand{\Lat}{\mathcal L}
+\newcommand{\cls}[1]{\idealclass(#1)}
+\newcommand{\action}{\star}
+
+\newcommand{\dual}{\widehat}
+
+\DeclareMathOperator{\Ker}{Ker}
+
+\DeclareMathOperator{\Gen}{\mathsf{Gen}}
+\DeclareMathOperator{\Sim}{\mathcal{S}}
+\DeclareMathOperator{\Adv}{\mathcal{A}}
+
+\newcommand{\seed}{\textsf{seed}}
+\newcommand{\sk}{\textsf{sk}}
+\newcommand{\pk}{\textsf{pk}}
+\newcommand{\msg}{\textsf{msg}}
+\newcommand{\ctx}{\textsf{ctx}}
+\newcommand{\prng}{\textsf{prng}}
+\newcommand{\prngdef}{\prng_\mathsf{def}}
+\newcommand{\prngkey}{\prng_\mathsf{key}}
+\newcommand{\prngcom}{\prng_\com}
+\newcommand{\prngres}{\prng_\mathsf{res}}
+
+
+\DeclareMathOperator{\Com}{\mathsf{C}}
+
+\newcommand{\com}{\mathsf{com}}
+\newcommand{\chall}{\mathsf{chl}}
+\newcommand{\chl}{\chall}
+\newcommand{\chal}{\chall}
+\newcommand{\resp}{\mathsf{rsp}}
+\newcommand{\rsp}{\resp}
+\newcommand{\aux}{\mathsf{aux}}
+
+\newcommand{\Epk}{\ensuremath{E_\pk}}
+\newcommand{\Ecom}{\ensuremath{E_\com}}
+\newcommand{\Echl}{\ensuremath{E_\chall}}
+\newcommand{\Echall}{\Echl}
+
+\newcommand{\thresh}{\tau}
+\newcommand{\eea}{\texttt{eea}}
+\newcommand{\ZTwoT}{\ensuremath{\texttt{Z2\_thresh}}}
+\newcommand{\ZTwoW}{\ensuremath{\texttt{Z2\_window}}}
+\newcommand{\ZTwoTGram}{\ensuremath{\texttt{Z2\_thresh\_gram}}}
+\newcommand{\ZTwoWGram}{\ensuremath{\texttt{Z2\_window\_gram}}}
+\newcommand{\ZiT}{\ensuremath{\texttt{Zi\_thresh}}}
+\newcommand{\ZiW}{\ensuremath{\texttt{Zi\_window}}}
+\newcommand{\ZiUpShift}{\ensuremath{\texttt{Up\_Shift}}}
+
+
+\DeclareMathOperator{\ShiftLeft}{\textsf{ShiftLeft}}
+\DeclareMathOperator{\ShiftRight}{\textsf{ShiftRight}}
+
+\newcommand{\challspace}{\ensuremath{E_{\chl}}}
+\newcommand{\challspaceexp}{\ensuremath{\secp}}
+\newcommand{\challisog}{\ensuremath{\varphi_{\chl}}}
+\newcommand{\challideal}{\ensuremath{I_{\chl}}}
+\newcommand{\basischall}{\ensuremath{\basis_{\chl}}}
+\newcommand{\Pchall}{\ensuremath{P_{\chl}}}
+\newcommand{\Qchall}{\ensuremath{Q_{\chl}}}
+\newcommand{\Ichl}{\challideal}
+
+\newcommand{\unifdeg}{\ensuremath{D_{\textsf{mix}}}}
+\newcommand{\matrixM}{\ensuremath{\textbf{M}}}
+\newcommand{\Id}[1]{\textbf{I}_{#1}}
+\newcommand{\commitdeg}{\unifdeg}
+\newcommand{\commitisog}{\ensuremath{\varphi_{\com}}}
+\newcommand{\commitideal}{\ensuremath{I_{\com}}}
+\newcommand{\basiscom}{\ensuremath{\basis_{\com}}}
+\newcommand{\Icom}{\commitideal}
+
+\newcommand{\secretisog}{\ensuremath{\varphi_{\sk}}}
+\newcommand{\secretidealI}{\ensuremath{I_{\sk}}}
+\newcommand{\secretdeg}{\unifdeg}
+\newcommand{\Isk}{\secretidealI}
+
+\newcommand{\responseisog}{\ensuremath{\varphi_{\rsp}}}
+\newcommand{\responseupperbound}{\ensuremath{D_{\rsp}}}
+\newcommand{\responseupperboundexponent}{\ensuremath{e_{\rsp}}}
+\newcommand{\responsequaternion}{\ensuremath{\alpha_{\rsp}}}
+\newcommand{\hintgen}{\textsf{hint}}
+\newcommand{\hintaux}{\hintgen_{\aux}}
+\newcommand{\hintchallenge}{\hintgen_{\chl}}
+\newcommand{\changeofbasismatrixchallenge}{\ensuremath{\matrixM_{\chl}}}
+\newcommand{\responseodddegree}{\ensuremath{q_{\rsp}}}
+\newcommand{\responseembeddingexponent}{\ensuremath{{e_{\rsp}}}}
+\newcommand{\responseexponent}{\responseembeddingexponent}
+
+\newcommand{\auxiliaryendo}{\ensuremath{\theta_{\aux}}}
+\newcommand{\auxiliarymatrix}{\ensuremath{\matrixM_{\aux}}}
+\newcommand{\auxiliaryideal}{\ensuremath{I_{\aux}}}
+\newcommand{\Eaux}{\ensuremath{E_{\aux}}}
+\newcommand{\basisaux}{\ensuremath{\basis_{\aux}}}
+\newcommand{\Paux}{\ensuremath{P_{\aux}}}
+\newcommand{\Qaux}{\ensuremath{Q_{\aux}}}
+\newcommand{\basisauxprime}{\ensuremath{\basis'_{\aux}}}
+\newcommand{\Eauxprime}{\ensuremath{E'_{\aux}}}
+
+\newcommand{\secp}{\ensuremath{\lambda}}
+
+\newcommand{\basis}{\mathcal{B}}
+
+% basis on the public curve Epk
+\newcommand{\basispk}{\ensuremath{\basis_{\pk}}}
+\newcommand{\Ppk}{\ensuremath{P_{\pk}}}
+\newcommand{\Qpk}{\ensuremath{Q_{\pk}}}
+\newcommand{\hintpk}{\textsf{hint}_{\pk}}
+
+\newcommand{\changeofbasismatrixsecret}{\ensuremath{\matrixM_{\sk}}}
+
+% Overbar for ideal conjugate
+\newcommand{\overbar}[1]{\mkern 1.5mu\overline{\mkern-1.5mu#1\mkern-1.5mu}\mkern 1.5mu}
+\newcommand{\conj}{\overbar}
+
+
+\newcommand{\bits}[1]{\operatorname{bits}(#1)}
+\newcommand{\bitlen}[1]{\operatorname{bitlen}(#1)}
+\newcommand{\LDL}{\texttt{LDL}}
+\newcommand{\BKZ}{\texttt{BKZ}}
+\newcommand{\LLL}{\texttt{LLL}}
+
+% For hash
+\newcommand{\shake}{\ensuremath{\mathsf{SHAKE256}}\xspace}
+% Generic notation for the (possibly iterated) hash function to use, specified in the parameter sets
+
+\newcommand{\hij}{\frac{\i+\j}{2}}
+\newcommand{\hko}{\frac{1+\k}{2}}
+
+
+\newcommand{\challsecideal}{\ensuremath{I_{\sk,\chl}}}
+\newcommand{\challsecquaternion}{\ensuremath{\alpha_{\sk,\chl}}}
+\newcommand{\responsematrix}{\ensuremath{\matrixM_{\rsp}}}
+
+\renewcommand{\fbox}[1]{#1}
+
+\newcommand{\DiadicEvaluation}{\DyadicValuation}
+
+
+
+\newcommand{\mixingdegree}{\commitdeg}
+\newcommand{\bool}{\mathsf{Boolean}}
+\newcommand{\str}[1]{\texttt{"#1"}}
+
+\newcommand{\ie}{i.e.,\xspace}
+\newcommand{\eg}{e.g.,\xspace}
+\newcommand{\prob}[1]{\ensuremath{\Pr\left[\begin{aligned}#1\end{aligned}\right]}}
+
+\newcommand{\concat}{\mathrel{||}}
+\newcommand{\ignored}[1]{\tikz{\node[draw=black,densely dotted,inner sep=0pt] {\phantom{N}};}}
+\newcommand{\sample}{\gets\mathllap{\vcenter{\hbox{\tiny\rmfamily\upshape\$}}}\;}
+
+
+% old macors, only used ones, hopefully will reduce them
+\newcommand{\adv}{\mathcal{A}}
+\newcommand{\bdv}{\mathcal{B}}
+\newcommand{\ddv}{\mathcal{D}}
+\newcommand{\Advantage}[2]{\mathsf{Adv}^{#1}_{#2}}
+\newcommand{\EUFCMA}{\ensuremath{\mathsf{EUF}\text{-}\mathsf{CMA}}\xspace}
+\newcommand{\EndRing}{\textsf{\upshape End\-Ring}\xspace}
+\newcommand{\OneEnd}{\textsf{\upshape One\-End}\xspace}
+
+% hints
+\newcommand{\hintdistr}{\ensuremath{\mathcal{H}}}
+\newcommand{\hintnum}{\ensuremath{q}}
+\newcommand{\hintreltxt}{\ensuremath{\mathsf{hint}\text{-}\mathsf{rel}}\xspace}
+\newcommand{\hintreladv}[4]{\ensuremath{\Advantage{\hintreltxt}{(#1, #2)}(#3, #4)}}
+\newcommand{\hint}{\ensuremath{h}}
+\newcommand{\hinthvzkadv}[4]{\ensuremath{\Advantage{\mathsf{hint}\text{-}\mathsf{wHVZK}}{#1,#2, #3}(#4)}}
+\newcommand{\sqihintdistrs}{\hyperref[fig:sqihintdistrs]{\ensuremath{\hintdistr^{\mathsf{sim}}}}}
+\newcommand{\sqihintdistrsE}{\hyperref[fig:sqihintdistrs]{\ensuremath{\hintdistr_E^{\mathsf{sim}}}}}
+\newcommand{\sqihintdistrc}{\hyperref[fig:sqihintdistrs]{\ensuremath{\hintdistr^{\mathsf{unif}}}}}
+\newcommand{\sqihintdistrcE}{\hyperref[fig:sqihintdistrs]{\ensuremath{\hintdistr_E^{\mathsf{unif}}}}}
+\newcommand{\sqihintdistrcEzero}{\hyperref[fig:sqihintdistrs]{\ensuremath{\hintdistr_{E_0}^{\mathsf{unif}}}}}
+\newcommand{\sqihintdistrcEone}{\hyperref[fig:sqihintdistrs]{\ensuremath{\hintdistr_{E_1}^{\mathsf{unif}}}}}
+\newcommand{\distrchl}{\hyperref[fig:sqihintdistrs]{\ensuremath{D_{\mathsf{Chall}}}}}
+\newcommand{\EndRingp}{\textsf{\upshape End\-Ring}\ensuremath{_{p}}\xspace}
+\newcommand{\sHintOneEndp}{\textsf{\upshape sim-hint}\textsf{\upshape -\-One\-End}\ensuremath{_{p}}\xspace}
+\newcommand{\dashsHintOneEndp}{\textsf{-}\sHintOneEndp}
+\newcommand{\qsHintOneEndp}{\ensuremath{\hintnum}\dashsHintOneEndp}
+\newcommand{\numRO}{\ensuremath{q}}
+\newcommand{\numOSign}{\ensuremath{s}}
+\newcommand{\cHintOneEndp}{\textsf{\upshape unif-hint}\textsf{\upshape -\-One\-End}\ensuremath{_{p}}\xspace}
+\newcommand{\dashcHintOneEndp}{\textsf{-}\cHintOneEndp}
+\newcommand{\qcHintOneEndp}{\ensuremath{\hintnum}\dashcHintOneEndp}
+\newcommand{\hintdist}{\ensuremath{\mathsf{hint}\textnormal{-}\mathsf{dist}}}
+\newcommand{\qHintEndRingp}{\ensuremath{\hintnum}\textsf{\upshape -unif-hint-\-End\-Ring}\ensuremath{_{p}}\xspace}
+
+
+\newcommand{\giacomo}[1]{\textcolor{red}{\textbf{#1}}}
+
+

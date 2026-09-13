@@ -1,0 +1,618 @@
+% TeX skeleton for papers done by Ryan Rueger
+
+\documentclass[envcountsect,envcountsame,orivec,runningheads,a4paper]{llncs}
+
+\newif\ifREDACT
+\newif\ifPUBLISH
+
+\REDACTfalse
+\PUBLISHfalse
+
+\ifPUBLISH
+\else
+% For easier reading on screens
+% Content is kept the same, only margins are smaller and font bolder
+% Remove for publication & review submission
+% \usepackage{mlmodern}
+\usepackage[c5paper, centering, textwidth=12.2cm, textheight=19.3cm, headsep=25pt, footskip=30pt,]{geometry}
+\fi
+
+% Packages & Configurations {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Standard maths packages
+\usepackage{amsmath}
+\usepackage{amscd}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{games}
+
+% \usepackage{algorithm}
+% \usepackage{algpseudocode}
+
+% Create the \cites command, without requiring biblatex support
+% https://tex.stackexchange.com/a/537201
+% Modified to _not_ include nbsp between entries [key, ref;<nbsp>key, ref]
+\usepackage{cite}
+\usepackage{cite}
+\makeatletter
+\newcommand{\citecomment}[2][]{\citen{#2}#1\citevar}
+\newcommand{\citeone}[1]{\citecomment{#1}}
+\newcommand{\citetwo}[2][]{\citecomment[,~#1]{#2}}
+\newcommand{\citevar}{\@ifnextchar\bgroup{; \citeone}{\@ifnextchar[{; \citetwo}{]}}}
+\newcommand{\citefirst}{\@ifnextchar\bgroup{\citeone}{\@ifnextchar[{\citetwo}{]}}}
+\newcommand{\cites}{[\citefirst}
+\makeatother
+
+% Using bookmarksdepth creates table of contents in pdf metadata
+\usepackage[
+  colorlinks=true,
+  allcolors=blue,
+  unicode,
+  bookmarksdepth=3
+]{hyperref}
+
+% Enumitem - Control layout of itemize, enumerate, description
+% Provides: enumerate and itemize environments
+% https://www.ctan.org/pkg/enumitem
+\usepackage[shortlabels]{enumitem}
+% Spacing around enumerate/itemize
+\setlist[enumerate]{noitemsep, topsep=0.8ex}
+\setlist[itemize]{noitemsep, nosep}
+
+% Mathtools - Mathematical tools to use with amsmath
+% Must be loaded _before_ unicode-math
+% Provides: \hookrightarrow, ...
+% https://www.ctan.org/pkg/mathtools
+\usepackage{mathtools}
+
+\usepackage{tikz}
+\usetikzlibrary{angles,arrows,calc,decorations.pathmorphing,matrix,shapes}
+
+% Create commutative diagrams with TikZ
+% https://ctan.org/pkg/tikz-cd
+\usepackage{tikz-cd}
+\tikzcdset{%
+  ampersand replacement=\&,
+  % /tikz/commutative diagrams/arrows={thick},
+}
+
+\usepackage{xspace}
+% }}}}}
+
+% Generic tex Commands {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\input{macros.tex}
+
+% https://tex.stackexchange.com/a/30726
+\newcommand\unnumberedfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+\newcommand{\eg}{\emph{e.g.}\ }
+\newcommand{\ie}{\emph{i.e.}\ }
+\newcommand{\cf}{\emph{c.f.}\ }
+% % }}}}}
+
+% Maths {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Class group
+\newcommand{\Cl}{\mathrm{Cl}}
+% Norm (Lowercase N not to clash with \N = \mathbb{N})
+\newcommand{\n}{\mathrm{N}}
+% Trace
+\newcommand{\tr}{\mathrm{tr}}
+
+% Sets
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set
+\newcommand{\set}[1]{\left\lbrace#1\right\rbrace}
+% Set with conditions (vertical line)
+\newcommand{\condset}[2]{\left\lbrace#1\,\mid\,#2\right\rbrace}
+% Set with conditions (colon)
+\newcommand{\condsetcolon}[2]{\left\lbrace#1\,:\,#2\right\rbrace}
+% Big Set
+\newcommand{\bigset}[1]{\bigl\lbrace#1\bigr\rbrace}
+% Big Set with conditions (vertical line)
+\newcommand{\bigccondset}[2]{\bigl\lbrace#1\,\mid\,#2\bigr\rbrace}
+% Big Set with conditions (colon)
+\newcommand{\bigcondsetcolon}[2]{\bigl\lbrace#1\,:\,#2\bigr\rbrace}
+
+% Styled arrows
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Overloaded \to for named arrow
+\renewcommand{\to}[1][]{\xrightarrow{#1}}
+% Injection
+\newcommand{\into}[1][]{\xhookrightarrow{#1}}
+% Surjection
+\newcommand{\onto}[1][]{\xrightarrow{#1}\mathrel{\mkern-14mu}\rightarrow}
+% Isomorphism map (https://tex.stackexchange.com/a/480761)
+\newcommand{\isoto}{\stackrel{\sim}{\smash{\to}\rule{0pt}{0.4ex}}}
+
+% Fractions
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Dynamically decide whether to place elements in fraction above each other or
+% next to each other based on whether in display mode or not.
+\let\defaultfrac\frac
+\renewcommand{\frac}[2]{\mathchoice{\defaultfrac{#1}{#2}}{#1/#2}{#1/#2}{#1/#2}}
+% Inline fractions
+\newcommand{\ifrac}[2]{#1/#2}
+
+% Quotients
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Tool for moving maths expressions
+\makeatletter
+\newcommand{\raisemath}[1]{\mathpalette{\raisemAth{#1}}}
+\newcommand{\raisemAth}[3]{\raisebox{#1}{$#2#3$}}
+\makeatother
+
+% Quotients (on right)
+% Dynamically decide how much space should be left between operands and how much
+% they should be raised, based on whether in display mode or not.
+\newcommand{\q}[2]{%
+  \mathchoice
+    {\raisemath{0.4ex}{#1} \big/ \raisemath{-0.4ex}{#2}}%
+    {#1/#2}%
+    {#1/#2}%
+    {#1/#2}%
+}
+
+% Quotient (on left)
+\newcommand{\ql}[2]{%
+  \mathchoice
+    {\raisemath{-0.4ex}{#2} \big\backslash \raisemath{0.4ex}{#1}}%
+    {#2\backslash#1}%
+    {#2\backslash#1}%
+    {#2\backslash#1}%
+}
+
+% Equalities
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\defeq}{\overset{\scriptscriptstyle\mathrm{def.}}{=}}
+\newcommand{\qefed}{\overset{\reflectbox{$\scriptscriptstyle\mathrm{def.}$}}{=}}
+\newcommand{\exeq}{\overset{\scriptscriptstyle\mathrm{!}}{=}}
+\newcommand{\absleq}{\overset{\abs{\cdot}}{\leq}}
+\newcommand{\normleq}{\overset{\norm{\cdot}}{\leq}}
+
+% Misc
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\algclosure}[1]{{#1}^{\textrm{al}}}
+\newcommand{\topclosure}[1]{\overline{#1}}
+\newcommand{\til}[1]{\widetilde{#1}}
+% Listing
+\newcommand{\until}{, \ldots,}
+\newcommand{\cuntil}{, \cdots,}
+% Ceiling function
+\newcommand{\ceiling}[1]{\left\lceil#1\right\rceil}
+% Floor function
+\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}
+
+% Bit of a hack using negative space
+\newcommand{\jacobi}[2]{%
+  \mathchoice
+  {\left(\mkern-8mu\left(\defaultfrac{#1}{#2}\right)\mkern-8mu\right)}%
+  {\left(\mkern-0mu\left(#1/#2\right)\mkern-0mu\right)}%
+  {\left(\mkern-3mu\left(#1/#2\right)\mkern-3mu\right)}%
+  {\left(\mkern-3mu\left(#1/#2\right)\mkern-3mu\right)}%
+}
+% }}}}}
+
+% Special Letters (\math{bb,frak,cal,sf}, \texttt) {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Very common rings
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+
+% For faster typesetting of the blackboard letters
+\newcommand{\bA}{\mathbb{A}} \newcommand{\bB}{\mathbb{B}}
+\newcommand{\bC}{\mathbb{C}} \newcommand{\bD}{\mathbb{D}}
+\newcommand{\bE}{\mathbb{E}} \newcommand{\bF}{\mathbb{F}}
+\newcommand{\bG}{\mathbb{G}} \newcommand{\bH}{\mathbb{H}}
+\newcommand{\bI}{\mathbb{I}} \newcommand{\bJ}{\mathbb{J}}
+\newcommand{\bK}{\mathbb{K}} \newcommand{\bL}{\mathbb{L}}
+\newcommand{\bM}{\mathbb{M}} \newcommand{\bN}{\mathbb{N}}
+\newcommand{\bO}{\mathbb{O}} \newcommand{\bP}{\mathbb{P}}
+\newcommand{\bQ}{\mathbb{Q}} \newcommand{\bR}{\mathbb{R}}
+\newcommand{\bS}{\mathbb{S}} \newcommand{\bT}{\mathbb{T}}
+\newcommand{\bU}{\mathbb{U}} \newcommand{\bV}{\mathbb{V}}
+\newcommand{\bW}{\mathbb{W}} \newcommand{\bX}{\mathbb{X}}
+\newcommand{\bY}{\mathbb{Y}} \newcommand{\bZ}{\mathbb{Z}}
+
+% For faster typesetting of the calligraphic letters
+% `\cr, \cf` already taken
+\newcommand{\ca}{\mathcal{a}} \newcommand{\cb}{\mathcal{b}}
+\newcommand{\cc}{\mathcal{c}} \newcommand{\cd}{\mathcal{d}}
+\newcommand{\ce}{\mathcal{e}}
+\newcommand{\cg}{\mathcal{g}} \newcommand{\ch}{\mathcal{h}}
+\newcommand{\ci}{\mathcal{i}} \newcommand{\cj}{\mathcal{j}}
+\newcommand{\ck}{\mathcal{k}} \newcommand{\cl}{\mathcal{l}}
+\newcommand{\cm}{\mathcal{m}} \newcommand{\cn}{\mathcal{n}}
+\newcommand{\co}{\mathcal{o}} \newcommand{\cp}{\mathcal{p}}
+\newcommand{\cq}{\mathcal{q}}
+\newcommand{\cs}{\mathcal{s}} \newcommand{\ct}{\mathcal{t}}
+\newcommand{\cu}{\mathcal{u}} \newcommand{\cv}{\mathcal{v}}
+\newcommand{\cw}{\mathcal{w}} \newcommand{\cx}{\mathcal{x}}
+\newcommand{\cy}{\mathcal{y}} \newcommand{\cz}{\mathcal{z}}
+
+\newcommand{\cA}{\mathcal{A}} \newcommand{\cB}{\mathcal{B}}
+\newcommand{\cC}{\mathcal{C}} \newcommand{\cD}{\mathcal{D}}
+\newcommand{\cE}{\mathcal{E}} \newcommand{\cF}{\mathcal{F}}
+\newcommand{\cG}{\mathcal{G}} \newcommand{\cH}{\mathcal{H}}
+\newcommand{\cI}{\mathcal{I}} \newcommand{\cJ}{\mathcal{J}}
+\newcommand{\cK}{\mathcal{K}} \newcommand{\cL}{\mathcal{L}}
+\newcommand{\cM}{\mathcal{M}} \newcommand{\cN}{\mathcal{N}}
+\newcommand{\cO}{\mathcal{O}} \newcommand{\cP}{\mathcal{P}}
+\newcommand{\cQ}{\mathcal{Q}} \newcommand{\cR}{\mathcal{R}}
+\newcommand{\cS}{\mathcal{S}} \newcommand{\cT}{\mathcal{T}}
+\newcommand{\cU}{\mathcal{U}} \newcommand{\cV}{\mathcal{V}}
+\newcommand{\cW}{\mathcal{W}} \newcommand{\cX}{\mathcal{X}}
+\newcommand{\cY}{\mathcal{Y}} \newcommand{\cZ}{\mathcal{Z}}
+
+% For faster typesetting of the fraction letters
+% `\fi` is already taken
+\newcommand{\fa}{\mathfrak{a}} \newcommand{\fb}{\mathfrak{b}}
+\newcommand{\fc}{\mathfrak{c}} \newcommand{\fd}{\mathfrak{d}}
+\newcommand{\fe}{\mathfrak{e}} \newcommand{\ff}{\mathfrak{f}}
+\newcommand{\fg}{\mathfrak{g}} \newcommand{\fh}{\mathfrak{h}}
+                               \newcommand{\fj}{\mathfrak{j}}
+\newcommand{\fk}{\mathfrak{k}} \newcommand{\fl}{\mathfrak{l}}
+\newcommand{\fm}{\mathfrak{m}} \newcommand{\fn}{\mathfrak{n}}
+\newcommand{\fo}{\mathfrak{o}} \newcommand{\fp}{\mathfrak{p}}
+\newcommand{\fq}{\mathfrak{q}} \newcommand{\fr}{\mathfrak{r}}
+\newcommand{\fs}{\mathfrak{s}} \newcommand{\ft}{\mathfrak{t}}
+\newcommand{\fu}{\mathfrak{u}} \newcommand{\fv}{\mathfrak{v}}
+\newcommand{\fw}{\mathfrak{w}} \newcommand{\fx}{\mathfrak{x}}
+\newcommand{\fy}{\mathfrak{y}} \newcommand{\fz}{\mathfrak{z}}
+
+\newcommand{\fA}{\mathfrak{A}} \newcommand{\fB}{\mathfrak{B}}
+\newcommand{\fC}{\mathfrak{C}} \newcommand{\fD}{\mathfrak{D}}
+\newcommand{\fE}{\mathfrak{E}} \newcommand{\fF}{\mathfrak{F}}
+\newcommand{\fG}{\mathfrak{G}} \newcommand{\fH}{\mathfrak{H}}
+\newcommand{\fI}{\mathfrak{I}} \newcommand{\fJ}{\mathfrak{J}}
+\newcommand{\fK}{\mathfrak{K}} \newcommand{\fL}{\mathfrak{L}}
+\newcommand{\fM}{\mathfrak{M}} \newcommand{\fN}{\mathfrak{N}}
+\newcommand{\fO}{\mathfrak{O}} \newcommand{\fP}{\mathfrak{P}}
+\newcommand{\fQ}{\mathfrak{Q}} \newcommand{\fR}{\mathfrak{R}}
+\newcommand{\fS}{\mathfrak{S}} \newcommand{\fT}{\mathfrak{T}}
+\newcommand{\fU}{\mathfrak{U}} \newcommand{\fV}{\mathfrak{V}}
+\newcommand{\fW}{\mathfrak{W}} \newcommand{\fX}{\mathfrak{X}}
+\newcommand{\fY}{\mathfrak{Y}} \newcommand{\fZ}{\mathfrak{Z}}
+
+% For faster typesetting of the monospace letters
+% `\mp, \mu` already taken
+\newcommand{\ma}{\texttt{a}} \newcommand{\mb}{\texttt{b}}
+\newcommand{\mc}{\texttt{c}} \newcommand{\md}{\texttt{d}}
+\newcommand{\me}{\texttt{e}} \newcommand{\mf}{\texttt{f}}
+\newcommand{\mg}{\texttt{g}} \newcommand{\mh}{\texttt{h}}
+\newcommand{\mi}{\texttt{i}} \newcommand{\mj}{\texttt{j}}
+\newcommand{\mk}{\texttt{k}} \newcommand{\ml}{\texttt{l}}
+\newcommand{\mm}{\texttt{m}} \newcommand{\mn}{\texttt{n}}
+\newcommand{\mo}{\texttt{o}}
+\newcommand{\mq}{\texttt{q}} \newcommand{\mr}{\texttt{r}}
+\newcommand{\ms}{\texttt{s}} \newcommand{\mt}{\texttt{t}}
+                             \newcommand{\mv}{\texttt{v}}
+\newcommand{\mw}{\texttt{w}} \newcommand{\mx}{\texttt{x}}
+\newcommand{\my}{\texttt{y}} \newcommand{\mz}{\texttt{z}}
+
+\newcommand{\mA}{\texttt{A}} \newcommand{\mB}{\texttt{B}}
+\newcommand{\mC}{\texttt{C}} \newcommand{\mD}{\texttt{D}}
+\newcommand{\mE}{\texttt{E}} \newcommand{\mF}{\texttt{F}}
+\newcommand{\mG}{\texttt{G}} \newcommand{\mH}{\texttt{H}}
+\newcommand{\mI}{\texttt{I}} \newcommand{\mJ}{\texttt{J}}
+\newcommand{\mK}{\texttt{K}} \newcommand{\mL}{\texttt{L}}
+\newcommand{\mM}{\texttt{M}} \newcommand{\mN}{\texttt{N}}
+\newcommand{\mO}{\texttt{O}} \newcommand{\mP}{\texttt{P}}
+\newcommand{\mQ}{\texttt{Q}} \newcommand{\mR}{\texttt{R}}
+\newcommand{\mS}{\texttt{S}} \newcommand{\mT}{\texttt{T}}
+\newcommand{\mU}{\texttt{U}} \newcommand{\mV}{\texttt{V}}
+\newcommand{\mW}{\texttt{W}} \newcommand{\mX}{\texttt{X}}
+\newcommand{\mY}{\texttt{Y}} \newcommand{\mZ}{\texttt{Z}}
+
+% For faster typesetting of the sans-serif letters
+% `\sb, \sc, \sf, \sl, \sp, \ss`
+\newcommand{\sa}{\mathsf{a}}
+                             \newcommand{\sd}{\mathsf{d}}
+\newcommand{\se}{\mathsf{e}}
+\newcommand{\sg}{\mathsf{g}} \newcommand{\sh}{\mathsf{h}}
+\newcommand{\si}{\mathsf{i}} \newcommand{\sj}{\mathsf{j}}
+\newcommand{\sk}{\mathsf{k}}
+\newcommand{\sm}{\mathsf{m}} \newcommand{\sn}{\mathsf{n}}
+\newcommand{\so}{\mathsf{o}}
+\newcommand{\sq}{\mathsf{q}} \newcommand{\sr}{\mathsf{r}}
+                             \newcommand{\st}{\mathsf{t}}
+\newcommand{\su}{\mathsf{u}} \newcommand{\sv}{\mathsf{v}}
+\newcommand{\sw}{\mathsf{w}} \newcommand{\sx}{\mathsf{x}}
+\newcommand{\sy}{\mathsf{y}} \newcommand{\sz}{\mathsf{z}}
+
+\newcommand{\sA}{\mathsf{A}} \newcommand{\sB}{\mathsf{B}}
+\newcommand{\sC}{\mathsf{C}} \newcommand{\sD}{\mathsf{D}}
+\newcommand{\sE}{\mathsf{E}} \newcommand{\sF}{\mathsf{F}}
+\newcommand{\sG}{\mathsf{G}} \newcommand{\sH}{\mathsf{H}}
+\newcommand{\sI}{\mathsf{I}} \newcommand{\sJ}{\mathsf{J}}
+\newcommand{\sK}{\mathsf{K}} \newcommand{\sL}{\mathsf{L}}
+\newcommand{\sM}{\mathsf{M}} \newcommand{\sN}{\mathsf{N}}
+\newcommand{\sO}{\mathsf{O}} \newcommand{\sP}{\mathsf{P}}
+\newcommand{\sQ}{\mathsf{Q}} \newcommand{\sR}{\mathsf{R}}
+\newcommand{\sS}{\mathsf{S}} \newcommand{\sT}{\mathsf{T}}
+\newcommand{\sU}{\mathsf{U}} \newcommand{\sV}{\mathsf{V}}
+\newcommand{\sW}{\mathsf{W}} \newcommand{\sX}{\mathsf{X}}
+\newcommand{\sY}{\mathsf{Y}} \newcommand{\sZ}{\mathsf{Z}}
+% }}}}}
+
+% Titles {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\title{Odd degree SQIsign}
+\titlerunning{Odd degree SQIsign}
+
+\ifREDACT
+  \authorrunning{Anonymous}
+  \author{Anonymous}
+\else
+  \authorrunning{Missing Authors}
+  \author{
+      First Author\inst{1}
+      \and
+      Second Author\inst{1,2}
+      \\[2mm]
+      {\footnotesize
+          \email{xxx@ibm.com},
+          \email{xxx@yyy.com},
+      }
+  }
+
+  \institute{
+    IBM Research Europe, Switzerland
+    \and
+    Institute, Country
+  }
+
+  \newcommand{\giacomo}[1]{{\color{brown} @GB \emph{#1}}}
+\fi
+% }}}}}
+
+% Bibliography {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Create infile bibliography: All LaTeX can exist within one source file
+\begin{filecontents}[overwrite]{\jobname.bib}
+@misc{cryptoeprint:2026/1775,
+      author = {Maher Mamah and David Jao},
+      title = {A Note on the Security Proof of {SQIsign}},
+      howpublished = {Cryptology {ePrint} Archive, Paper 2026/1775},
+      year = {2026},
+      url = {https://eprint.iacr.org/2026/1775}
+}
+% Exported from: https://eudml.org/doc/183547
+@article{misc:Kani1997,
+  author = {Kani, Ernst},
+  journal = {Journal für die reine und angewandte Mathematik},
+  keywords = {elliptic differentials; curve of genus 2 defined over an algebraically closed field; elliptic subcover},
+  pages = {93-122},
+  title = {The number of curves of genus two with elliptic differentials.},
+  url = {http://eudml.org/doc/183547},
+  volume = {485},
+  year = {1997},
+}
+@book{misc:Cox13,
+  title={Primes of the form $x^2+ny^2$: {F}ermat, class field theory, and complex multiplication},
+  author={Cox, David A.},
+  series={Pure and Applied Mathematics},
+  year={2013},
+  publisher={Wiley},
+   EDITION = {2nd},
+  volume = {116},
+  pages = {384}
+}
+@article{misc:Siegel1935,
+  author = {Siegel, Carl},
+  journal = {Acta Arithmetica},
+  keywords = {class number; quadratic fields; L-series; Hecke lemma},
+  language = {ger},
+  number = {1},
+  pages = {83-86},
+  title = {Über die Classenzahl quadratischer Zahlkörper},
+  url = {http://eudml.org/doc/205054},
+  volume = {1},
+  year = {1935},
+}
+\end{filecontents}
+% }}}}}
+
+\begin{document}
+
+\maketitle
+\ifREDACT
+\else
+  \unnumberedfootnote{\scriptsize \hspace{-1em} Authors listed alphabetically; see \url{https://ams.org/profession/leaders/CultureStatement04.pdf}.}
+\fi
+
+% Abstract {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+    The purpose of this paper is to explain the design choices behind the use of SQIsign with only odd degree isogenies.
+
+  \keywords{First keyword \and Second keyword \and Third keyword}
+\end{abstract}
+% }}}}}
+
+% Introduction {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+\noindent
+
+\subsubsection{Our Contributions.}
+
+\begin{enumerate}[-]
+    \item First contribution.
+    \item Second contribution.
+    \item Third contribution.
+\end{enumerate}
+
+\newpage
+\subsubsection{Technical overview.}
+
+In this work, we do thing.
+If we are isogenists, we may use~\cite{misc:Kani1997}.
+
+\subsubsection{Outline.}
+
+In section 1, we do thing 1.
+
+In section 2, we do thing 2.
+
+In section 3, we do thing 3.
+% }}}}}
+
+% Preliminaries {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Preliminaries}\label{sec:preliminaries}
+% }}}}}
+
+% {{{{{
+\section{Lattice analysis}
+We need to analyze the properties of the lattice $\Hom(\Ecom, \Echall)$, deducing the existence of a suitable response isogeny $\phi_\resp$ of odd degree from the lattice minima.
+
+We explain now how to use the natural surjection $\Hom(\Ecom, \Echall) \to (\mathbb{Z}/2\mathbb{Z})^2$ for this goal.
+
+
+We also need to compute the intersection between the boundary of the ball of radius $D$ and the shifted foundamental domain of the lattice $\Hom(\Ecom, \Echall)$.
+
+
+% }}}}}
+
+% {{{{{
+\section{Impact on SQIsign}
+Note for comparison: the correct value for log of challenge degree in the even case is $\log p / 2 + \lambda$.
+This because we need, by the soundness argument of SQIsign2D-west to have $e_{resp} + e_{ch} \leq e$, with $e$ the logarithm of the challenge degree.
+For odd case is, given a failure $\leq 1/\epsilon$ the num of $(2,2)$ isogenies is $\log p / 2 + \log \epsilon / 4$.
+For the case of:
+
+\begin{table}
+    \caption{Comparison of amortized timing}\label{tab:timing}
+    \begin{center}
+        \begin{tabular}[c]{lll}
+            \hline
+            \multicolumn{1}{c}{\textbf{case}} & 
+            \multicolumn{1}{c}{\textbf{$2$-isogenies}} &
+            \multicolumn{1}{c}{\textbf{$(2,2)$-isogenies}} \\
+            \hline
+            even & $\log p / 2 + \lambda$ & $\log p / 2 $ \\
+            odd-$\log \epsilon = {\lambda}$ & $ \lambda$ & $\log p / 2 + \lambda/4$ \\
+            odd-$\log \epsilon = {64}$ & $ \lambda$ & $\log p / 2 + 16$ \\
+            odd-$\log \epsilon = {128}$ & $ \lambda$ & $\log p / 2 + 32$ \\
+            \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+
+The amortized difference (assuming one $(2,2)$-isogeny is equivalent to four $2$-isogenies) between the odd and even cases is $\log p /8 - \lambda/4$ for the first two cases.
+We expect the odd degree variant to be roughly more efficient when $2 \lambda \leq  \log p$, that will be the case for the new parameters we will have to consider.
+% }}}}}
+
+% {{{{{
+\section{Updated security proof}
+We then consider an updated security proof, modeled over the framework in~\cite{C:ABDPW25}. 
+In~\cite{C:ABDPW25} the proof strategy is:
+\begin{enumerate}
+    \item Use Lemma 2.2 to pass from EUF-CMA to identification protocol, loss $\numRO $, multiplicative
+    \item Swap the actual commitment distribution for the stationary distribution, with additive loss in $\numOSign$.
+    \item Swap the hint distributions
+\end{enumerate}
+
+Here we propose to swap the reduction order.
+\begin{enumerate}
+    \item Swap the actual commitment distribution for the stationary distribution, with additive loss in $\numOSign$.
+    \item Use Lemma 2.2 to pass from EUF-CMA to identification protocol, loss $\numRO $, multiplicative
+    \item Swap the hint distributions
+\end{enumerate}
+In this way we do not have anymore to combine the multiplicative loss in \numRO by the additive one in \numOSign.
+This swap, however, does not come for free. 
+We have to be careful with swapping the commitment distribution properly, essentially we need to rewrite the proof of Lemma 2.2 (\cite[Lemma~3.5]{EC:AABN02}) to use the hints immediately when simulating the signatures. 
+This will avoid to ``bake'' the multiplicative loss inside the reduction. This can be seen as a refinement of the hint-framework.
+Essentially we need to avoid using Lemma 3.1~\cite{C:ABDPW25} and instead add a game hop in the lemma proof in which we directly swap in the \textbf{Initialize} step. 
+The important step is that this should happen \emph{after} the game hop in which the $\mathsf{bad}$ flag is handled, i.e. between the first and second game.
+Roughly the games should be as follows:
+\begin{games}
+    \game{hintIMPPA} The game for hint-IMP-PA, like Definition 3.5~\cite{C:ABDPW25}.
+    \game{Gsim} The game for hint-IMP-PA, but with the simulator using the hints to simulate the transcripts.
+    \game{G0} from
+\end{games}
+
+
+We also plan to use \cite[Proposition 1]{cryptoeprint:2026/1775} to bound the distance.
+
+
+Contents of the section:
+\begin{enumerate}
+    \item Explicit simulator definition
+    \item Explicit reduction as in the spec, assuming negligible failure
+    \item Reduction for the case in which there are non-negligible failures
+\end{enumerate}
+
+
+
+
+
+% \begin{figure}[htb]
+%     \begin{adjustbox}{varwidth=\textwidth,margin=5 5 5 5, frame=0.5pt }
+%     %
+%     $\distrchl(E)$:
+%     %
+%         \begin{algorithmic}[1]
+%             \State Sample $s \in \{0,\dots, 2^{\secp} -1\}$.
+%             \State $(P, Q), \ignored{\_} \gets \TorsionBasisToHint(E, \secp + 2, 0)$
+%             \State {$E', \ignored{\_}\gets \TwoIsogenyChain(P + [s]Q, E, \secp)$}\Comment{The $2^{\secp}$-isogeny with kernel $\langle [4](P + [s]Q) \rangle$ has codomain $E'$}
+%             \State Return $s, E'$.
+%         \end{algorithmic}
+%     \vspace{1ex}
+%     %
+%     $\sqihintdistrsE$:
+%     %
+%         \begin{algorithmic}[1]
+%             \State $s, E_1 \gets \distrchl(E)$.
+%             \State Sample $E_2$ according to the stationary distribution\footnotemark over the set of supersingular curves over $\Fpsq$.
+%             \State If no odd-degree isogeny $\varphi_2 \colon E_1 \rightarrow E_2$ with $\deg(\varphi_2)<\responseupperbound$ exists, return $\hint = (s, E_2, \bot)$. \label{line:hintdist-early-exit}
+%             \State Sample an isogeny $\varphi_2 \colon E_1 \rightarrow E_2$ uniformly among isogenies $E_1 \rightarrow E_2$ of odd degree $<\responseupperbound$.
+%             \State Write $d \gets \deg(\varphi_2)$.
+%             \State Sample an isogeny $\varphi_3\colon E_2 \rightarrow E_3$ uniformly among the cyclic isogenies from $E$ of degree $2^{\responseexponent} -d$.
+%             \State Return $\hint=(s, \varphi_2, \varphi_3)$.
+%         \end{algorithmic}
+%     \vspace{1ex}
+%     %
+%     $\sqihintdistrcE$:
+%     %
+%         \begin{algorithmic}[1]
+%             \State $s, E_1 \gets \distrchl(E)$.
+%             \State Sample an integer $d$ from a weighted distribution on the interval $[1, \responseupperbound]$ in which each odd integer $n$, with prime factorization $n = \prod_{i = 1}^{t} p_i^{e_i}$, has weight $\prod_{i=1}^{t} (p_i + 1)p_i^{e_i - 1}$.
+%             \State Sample an isogeny $\phi_2\colon E_1 \rightarrow E_2$ uniformly among the (possibly non-cyclic) isogenies from $E_1$ of degree $d$.
+%             \State Sample an isogeny $\phi_3\colon E_2 \rightarrow E_3$ uniformly among the cyclic isogenies from $E_2$ of degree $2^{\responseexponent}-d$.
+%             \State Return $h = (s, \phi_2, \phi_3)$.
+%         \end{algorithmic}
+%     \end{adjustbox}
+%     \footnotetext{We refer to~\cite{C:ABDPW25} for the definition of the stationary distribution.}
+% \caption{Hint distributions for \sqisign{}.}\label{fig:sqihintdistrs}
+% \end{figure}
+
+
+% }}}}}
+
+
+% Bibliography {{{{{
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\bibliographystyle{splncs04}
+\bibliography{\jobname.bib,cryptobib/abbrev3,cryptobib/crypto}
+% }}}}}
+
+\end{document}
+
+% vim: foldmethod=marker foldmarker={{{{{,}}}}}

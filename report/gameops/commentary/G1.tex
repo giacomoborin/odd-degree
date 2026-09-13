@@ -1,0 +1,10 @@
+Obtained from $\tfgamename{gameops}{G0}$ by deleting the single line $26$: a
+signing query that hits an already defined table entry no longer re-uses the
+stored value, but overwrites it with the freshly sampled challenge
+$\chall_\sctr$.
+
+Line $26$ follows the setting of $\badprog$ at line $25$, so the two games
+are identical-until-$\badprog$. The commitment produced by $\Prover_1(x,w)$ is
+independent of the message and of the history of the game, so the flag is set
+with probability at most
+$(\numRO + \numOSign + 1)\,\numOSign \cdot \minentropy{\Sigma}$.

@@ -1,0 +1,8 @@
+Line $38$ is added: when the guess is wrong, $\chall^*$ is overwritten with
+$\HT[\QT[\fpguess]]$, so the verifier runs on the challenge sitting at the
+\emph{guessed} position rather than at the correct one.
+
+Line $38$ follows the setting of $\badev$ at line $37$, so
+$\tfgamename{gameops}{G4}$ and $\tfgamename{gameops}{G5}$ are
+identical-until-$\badev$ and the two games agree on the event that the output
+is $1$ and the flag is never set.

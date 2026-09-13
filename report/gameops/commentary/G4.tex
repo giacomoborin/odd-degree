@@ -1,0 +1,16 @@
+Bookkeeping is added to $\mathbf{Finalize}$: an index
+$\fpguess \sample \set{1 \until \numRO+1}$ is drawn at line $31$ and compared
+at line $36$ with the index $j$ such that $\QT[j] = u^*$.
+
+The index $\fpguess$ is drawn before both early rejections, hence on every run,
+and it is used neither in the answers to the queries of $\adv$ nor in the
+computation of the output. So the whole run of $\adv$ is independent of
+$\fpguess$, and on the event that the game outputs $1$ the procedure reaches
+line $36$, whence $\goodev_4$ holds if and only if $j = \fpguess$. This is
+where the factor $\numRO + 1$ enters.
+
+The factorised form $\Pr[\bG \Rightarrow 1 \wedge \goodev] =
+\Pr[\bG \Rightarrow 1] \cdot \Pr[\goodev]$ is \emph{not} available here:
+because of the early rejections at lines $32$ and $35$, which have no
+counterpart in the original argument, $\badev$ is also left unset on runs that
+reject early, so $\Pr[\goodev_4] > 1/(\numRO+1)$.

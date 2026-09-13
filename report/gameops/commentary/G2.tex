@@ -1,0 +1,9 @@
+The $\numOSign$ transcripts consumed by the signing oracle are sampled
+\emph{eagerly}, in $\mathbf{Initialize}$, instead of on demand, and $\badprog$
+is dropped. This is possible precisely because in
+$\tfgamename{gameops}{G1}$ the value stored in $\HT$ no longer influences the
+transcript, so $\pi_i$ is a function of $(x,w)$ and of fresh randomness only.
+
+The rewriting is perfect. Its point is that $\mathbf{Initialize}$ now runs the
+experiment $\Real_\Sigma(1^\secp, \numOSign)$ verbatim, which is what makes the
+next hop a reduction to hint-assisted \textsf{wHVZK}.

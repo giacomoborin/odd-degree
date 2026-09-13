@@ -28,9 +28,6 @@
 \usepackage{amssymb}
 \usepackage{games}
 
-% \usepackage{algorithm}
-% \usepackage{algpseudocode}
-
 % Create the \cites command, without requiring biblatex support
 % https://tex.stackexchange.com/a/537201
 % Modified to _not_ include nbsp between entries [key, ref;<nbsp>key, ref]
@@ -56,10 +53,10 @@
 % Enumitem - Control layout of itemize, enumerate, description
 % Provides: enumerate and itemize environments
 % https://www.ctan.org/pkg/enumitem
-\usepackage[shortlabels]{enumitem}
+% \usepackage[shortlabels]{enumitem}
 % Spacing around enumerate/itemize
-\setlist[enumerate]{noitemsep, topsep=0.8ex}
-\setlist[itemize]{noitemsep, nosep}
+% \setlist[enumerate]{noitemsep, topsep=0.8ex}
+% \setlist[itemize]{noitemsep, nosep}
 
 % Mathtools - Mathematical tools to use with amsmath
 % Must be loaded _before_ unicode-math
@@ -77,6 +74,9 @@
   ampersand replacement=\&,
   % /tikz/commutative diagrams/arrows={thick},
 }
+
+%%---- Cryptocode
+\usepackage[]{cryptocode/cryptocode}
 
 \usepackage{xspace}
 % }}}}}

@@ -315,4 +315,19 @@
 
 \newcommand{\giacomo}[1]{\textcolor{red}{\textbf{#1}}}
 
+% Macros restored from an earlier version of main.tex (deleted in 7cd1661,
+% still used by extended_proof.tex)
+\newcommand{\cC}{\mathcal{C}}
+\newcommand{\cE}{\mathcal{E}}
+\newcommand{\defeq}{\overset{\scriptscriptstyle\mathrm{def.}}{=}}
+\newcommand{\until}{, \ldots,}
+
+% Overloaded \to for named arrow
+\renewcommand{\to}[1][]{\xrightarrow{#1}}
+
+% Dynamically decide whether to place elements in fraction above each other or
+% next to each other based on whether in display mode or not.
+\let\defaultfrac\frac
+\renewcommand{\frac}[2]{\mathchoice{\defaultfrac{#1}{#2}}{#1/#2}{#1/#2}{#1/#2}}
+
 

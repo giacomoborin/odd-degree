@@ -78,6 +78,12 @@
 %%---- Cryptocode
 \usepackage[]{cryptocode/cryptocode}
 
+%%---- TeXFrog: game-hopping pseudocode (see report/gameops/)
+%% texfrog-compat must be loaded first: it back-ports the e-type expl3
+%% argument variants that texfrog.sty needs but TeX Live 2023 lacks.
+\usepackage{gameops/texfrog-compat}
+\usepackage[package=cryptocode]{gameops/texfrog}
+
 \usepackage{xspace}
 % }}}}}
 

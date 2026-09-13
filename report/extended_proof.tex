@@ -1,28 +1,7 @@
-% Local notation for this section.
-% `providecommand` is used so that nothing breaks if these are later moved to
-% macros.tex.
-\providecommand{\RO}{\ensuremath{\mathsf{RO}}}
-\providecommand{\OSign}{\ensuremath{\mathsf{OSign}}}
-\providecommand{\OTrans}{\ensuremath{\mathsf{OTrans}}}
-\providecommand{\HT}{\ensuremath{\mathsf{HT}}}
-\providecommand{\QT}{\ensuremath{\mathsf{QT}}}
-\providecommand{\minentropy}[1]{\ensuremath{\mathsf{MinEnt}(#1)}}
-\providecommand{\SIG}{\ensuremath{\mathsf{SIG}}}
-\providecommand{\sig}{\ensuremath{\mathsf{sig}}}
-\providecommand{\abs}[1]{\ensuremath{\lvert #1 \rvert}}
-\providecommand{\Prover}{\ensuremath{\mathcal{P}}}
-\providecommand{\Verif}{\ensuremath{\mathcal{V}}}
-\providecommand{\Real}{\ensuremath{\mathsf{Real}}}
-\providecommand{\HintSim}{\ensuremath{\mathsf{HintSim}}}
-\providecommand{\hintimppaadv}[4]{%
-  \ensuremath{\Advantage{\mathsf{hint}\text{-}\mathsf{IMP}\text{-}\mathsf{PA}}{#1,#2}(#3,#4)}}
-\providecommand{\badev}{\ensuremath{\mathsf{bad}}}
-\providecommand{\badprog}{\ensuremath{\mathsf{bad}_\mathsf{prog}}}
-\providecommand{\goodev}{\ensuremath{\mathsf{Good}}}
-\providecommand{\fpguess}{\ensuremath{\mathsf{fp}}}
-\providecommand{\hctr}{\ensuremath{\mathsf{hc}}}
-\providecommand{\sctr}{\ensuremath{\mathsf{sc}}}
-\providecommand{\Qset}{\ensuremath{\mathcal{Q}}}
+% Notation for this section lives in gameops/notation.tex, which is shared
+% with the TeXFrog HTML viewer so that the pseudocode renders identically in
+% the paper and in the browser.
+\input{gameops/notation.tex}
 \providecommand{\cmt}{\ensuremath{/\!\!/\;}}
 
 \subsection{A hint-aware Fiat--Shamir reduction}\label{sec:fs-hints}
@@ -101,7 +80,7 @@ components have a fixed length.
 \begin{proof}
     We use code-based game playing~\cite{EC:BelRog06}, following the proof
     of~\cite[Lemma~3.5]{EC:AABN02}; the games are given in
-    Figures~\ref{fig:games-real} and~\ref{fig:games-guess} and are the following.
+    Figure~\ref{fig:games} and are the following.
     \begin{games}
         \game{gm0} The \EUFCMA game of $\SIG[\Sigma]$, with a lazily sampled
         random oracle.
@@ -111,10 +90,10 @@ components have a fixed length.
         \game{gm2} The $\numOSign$ honest transcripts are sampled eagerly, so that
         $\mathbf{Initialize}$ runs the experiment $\Real_\Sigma(1^\secp,
         \numOSign)$ of~\cite[Experiment~2]{C:ABDPW25}.
-        \game{gm3} The honest transcripts are replaced by hint-assisted simulated
-        ones, so that $\mathbf{Initialize}$ runs
-        $\HintSim_\Sigma(1^\secp, \numOSign, \Sim)$. This is the hop that reduces
-        to hint-assisted \textsf{wHVZK}, and from here on the witness is unused.
+        \game{gm3} The honest transcripts are replaced by hint-assisted
+        simulated ones: $\mathbf{Initialize}$ now runs $\HintSim_\Sigma$ rather
+        than $\Real_\Sigma$. This is the hop that reduces to hint-assisted
+        \textsf{wHVZK}, and from here on the witness is unused.
         \game{gm4} A guess $\fpguess$ of the index of the random-oracle query
         underlying the forgery is drawn, and a second flag $\badev$ is set if the
         guess is wrong. The guess does not influence the output.
@@ -180,7 +159,7 @@ components have a fixed length.
     the original forger.
 
     \subsubsection*{From the \EUFCMA game to the simulated game.}
-    Game $\printgame{gm0}$ of Figure~\ref{fig:games-real} is the \EUFCMA game for
+    Game $\printgame{gm0}$ of Figure~\ref{fig:games} is the \EUFCMA game for
     $\SIG[\Sigma]$, written so that the random oracle is lazily sampled into a
     table $\HT$ and so that the list $\QT$ records, in order, the arguments of
     the \emph{fresh} $\RO$ queries of $\adv$; queries answered from $\HT$ and
@@ -188,7 +167,7 @@ components have a fixed length.
     the signing oracle executes lines $23$--$26$, which set $\chall_\sctr
     \coloneqq \HT[u]$ if that entry is defined and $\chall_\sctr \sample \cC$
     otherwise; line $27$ then rewrites the same value and is a no-op in the first
-    case. This is exactly the signing algorithm of $\SIG[\Sigma]$. Line $33$
+    case. This is exactly the signing algorithm of $\SIG[\Sigma]$. Line $35$
     reads $\HT[u^*]$ directly rather than calling $\RO$, which is harmless
     because property (ii) guarantees that this entry is defined. Hence
     \begin{equation}\label{eq:g0}
@@ -244,8 +223,8 @@ components have a fixed length.
 
     We have arranged the game so that $\mathbf{Initialize}$ now consists of the
     experiment $\Real_\Sigma(1^\secp, \numOSign)$ of
-    \cite[Experiment~2]{C:ABDPW25} (its lines $1$ and $3$--$6$) together with the
-    bookkeeping of line $2$, with
+    \cite[Experiment~2]{C:ABDPW25} (lines $1$, $3$--$5$ and $8$ of
+    Figure~\ref{fig:games}) together with the bookkeeping of line $2$, with
     $x$ handed to $\adv$ as the public key and the transcripts $\pi_1 \until
     \pi_\numOSign$ kept as game state. Game $\printgame{gm3}$ replaces
     $\Real_\Sigma(1^\secp, \numOSign)$ by
@@ -253,7 +232,7 @@ components have a fixed length.
     the $i$-th transcript is produced as $\pi_i \gets \Sim(x, \hint_i)$ with
     $\hint_i \gets \hintdistr_x$. Consider the distinguisher $\ddv$ which, on
     input $(x, \pi_1 \until \pi_\numOSign)$, runs $\adv$ on $\pk = x$, answers
-    its $\RO$ queries by lazy sampling as in Figure~\ref{fig:games-real}, answers
+    its $\RO$ queries by lazy sampling as in Figure~\ref{fig:games}, answers
     its $\sctr$-th signing query on $\msg$ by parsing $\pi_\sctr$ as
     $(\com_\sctr, \chall_\sctr, \rsp_\sctr)$, programming $\HT[\com_\sctr \concat
     x \concat \msg] \coloneqq \chall_\sctr$ and returning $\pi_\sctr$, and
@@ -281,18 +260,18 @@ components have a fixed length.
     From now on the game does not use the witness: it is entirely determined by
     $x$, by $\numOSign$ hints, and by the code of $\Sim$. It remains to turn
     $\adv$ into an impersonator, which is done by the guessing argument
-    of~\cite{EC:AABN02}; we recall it in Figure~\ref{fig:games-guess}, in the
+    of~\cite{EC:AABN02}; we recall it in Figure~\ref{fig:games}, in the
     order that suits us.
 
     Game $\printgame{gm4}$ is game $\printgame{gm3}$ with bookkeeping added to
     $\mathbf{Finalize}$: an index $\fpguess \sample \set{1 \until \numRO+1}$ is
-    drawn at line $71$ and compared at line $76$ with the index $j$ such that
+    drawn at line $31$ and compared at line $36$ with the index $j$ such that
     $\QT[j] = \com^* \concat x \concat \msg^*$. This index is well defined
-    whenever line $74$ is reached. Indeed, by property (ii) the point $u^* =
+    whenever line $34$ is reached. Indeed, by property (ii) the point $u^* =
     \com^* \concat x \concat \msg^*$ was queried to $\RO$ by $\adv$; that query
     was fresh, because the only other way for $\HT[u^*]$ to become defined is a
     signing query, which by injectivity of the encoding would require $\msg^* \in
-    \Qset$, excluded by line $72$; hence $u^*$ was appended to $\QT$. Moreover
+    \Qset$, excluded by line $32$; hence $u^*$ was appended to $\QT$. Moreover
     $j \leq \hctr \leq \numRO+1$, so $j$ lies in the range from which $\fpguess$
     is drawn.
 
@@ -301,7 +280,7 @@ components have a fixed length.
     in the answers to the queries of $\adv$ nor in the computation of the output.
     Consequently the whole run of $\adv$ is independent of $\fpguess$, and hence so
     are both the event $\set{\printgame{gm4}^\adv \Rightarrow 1}$ and the index
-    $j$; moreover, on that event $\mathbf{Finalize}$ reaches line $76$, so
+    $j$; moreover, on that event $\mathbf{Finalize}$ reaches line $36$, so
     $\goodev_4$ holds if and only if $j = \fpguess$. Hence
     \begin{equation}\label{eq:g3g4}
         \begin{aligned}
@@ -317,15 +296,15 @@ components have a fixed length.
     Note that \eqref{eq:g3g4} must be phrased through the joint event, and
     \emph{not} in the factorised form $\Pr[\bG \Rightarrow 1 \wedge \goodev] =
     \Pr[\bG \Rightarrow 1]\cdot\Pr[\goodev]$ used in~\cite{EC:AABN02}: because of
-    the early rejections at lines $72$ and $75$, which have no counterpart there,
+    the early rejections at lines $32$ and $35$, which have no counterpart there,
     the flag $\badev$ is also left unset on runs that reject early, so
     $\Pr[\goodev_4] > 1/(\numRO+1)$.
 
     Game $\printgame{gm5}$ additionally overwrites $\chall^*$ with
     $\HT[\QT[\fpguess]]$ when $j \neq \fpguess$, that is, it runs the verifier on
     the challenge sitting at the \emph{guessed} position rather than at the
-    correct one. This modification is line $78$, which follows the setting of
-    $\badev$ at line $77$, so $\printgame{gm4}$ and $\printgame{gm5}$ are
+    correct one. This modification is line $38$, which follows the setting of
+    $\badev$ at line $37$, so $\printgame{gm4}$ and $\printgame{gm5}$ are
     identical-until-$\badev$ and \eqref{eq:good} gives
     \begin{equation}\label{eq:g4g5}
         \Pr[\printgame{gm4}^\adv \Rightarrow 1 \wedge \goodev_4]
@@ -366,21 +345,21 @@ components have a fixed length.
     the witness: the $\numOSign$ hints and the simulator $\Sim$ suffice. That
     $\printgame{gm6}$ draws $\chall^\circ$ already in $\mathbf{Initialize}$, whereas
     $\bdv_2$ receives it only after $\bdv_1$ has output $\com^*$, is immaterial:
-    the value is first \emph{used} at line $54$, which is exactly the point at
+    the value is first \emph{used} at line $12'$, which is exactly the point at
     which $\bdv_1$ stops.
 
     We claim that on the event $\set{\printgame{gm6}^\adv \Rightarrow 1} \cap
-    \goodev_6$ the conversation of $\bdv$ with the verifier is exactly $(\com^*,
-    \chall^\circ, \rsp^*)$ and is accepting. On that event $\mathbf{Finalize}$
-    reaches line $79$, so neither early rejection fired; since $\goodev_6$ holds
-    and line $76$ was evaluated, $j = \fpguess$. Hence $\QT[\fpguess] = u^*$ and,
-    by line $75$, $\chall^* = \HT[u^*]$. The
+    \goodev_6$ the conversation of $\bdv$ with the verifier is exactly the
+    triple $(\com^*, \chall^\circ, \rsp^*)$, and that it is accepting. On that event $\mathbf{Finalize}$
+    reaches line $39$, so neither early rejection fired; since $\goodev_6$ holds
+    and line $36$ was evaluated, $j = \fpguess$. Hence $\QT[\fpguess] = u^*$ and,
+    by line $35$, $\chall^* = \HT[u^*]$. The
     entry $\HT[u^*]$ was set to $\chall^\circ$ at the $\fpguess$-th fresh $\RO$
     query, and it was not modified afterwards: the only other writer is
     $\OSign$, which programs points of the form $\com \concat x \concat \msg$
-    with $\msg \in \Qset$, whereas $\msg^* \notin \Qset$ by line $72$, so
+    with $\msg \in \Qset$, whereas $\msg^* \notin \Qset$ by line $32$, so
     injectivity of the encoding rules this out. Therefore $\chall^* =
-    \chall^\circ$, line $78$ is not executed, and the game returns
+    \chall^\circ$, line $38$ is not executed, and the game returns
     $\Ver_\Sigma(x, \com^*, \chall^\circ, \rsp^*) = 1$, which is precisely the
     winning condition of $\bdv$. Consequently
     \begin{equation}\label{eq:g6b}
@@ -401,7 +380,7 @@ components have a fixed length.
     which is the claim. \qed
 \end{proof}
 
-\input{gameops.tex}
+\input{gameops/gameops.tex}
 
 \subsection{The improved \EUFCMA bound}\label{sec:eufcma-gen}
 

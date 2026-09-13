@@ -113,9 +113,9 @@
     % \textwidth.  (\resizebox is not an option here -- cryptocode's stacks
     % contain vertical-mode material.)
     \renewcommand{\pclnspace}{0.4em}%
-    \tfrenderfigure{gameops}{G0,G1,G2,G3,G4,G5,G6}
+    \tfrenderfigure{gameops}{G0,G1,G2,G3}
     \caption{%
-        The games $\printgame{gm0}$--$\printgame{gm6}$ of the proof of
+        The games $\printgame{gm0}$--$\printgame{gm3}$ of the proof of
         Lemma~\ref{lem:fs-hints}, as a single listing: a line carrying no
         annotation belongs to every game, and a line annotated
         $\cmt \printgame{gm4}, \printgame{gm5}$ occurs only in the games
@@ -131,7 +131,20 @@
         transcripts of $\Real_\Sigma(1^\secp, \numOSign)$ and
         $\printgame{gm3}$ by those of
         $\HintSim_\Sigma(1^\secp, \numOSign, \Sim)$, after which the witness
-        $w$ is no longer used; $\printgame{gm4}$ adds the guess $\fpguess$
+        $w$ is no longer used. 
+    }\label{fig:games1}
+\end{figure}
+
+\begin{figure}[htb]
+    \centering
+    % Tighten the gutter between the two stacks and the gap after the line
+    % numbers: at their defaults the figure is a few points wider than
+    % \textwidth.  (\resizebox is not an option here -- cryptocode's stacks
+    % contain vertical-mode material.)
+    \renewcommand{\pclnspace}{0.4em}%
+    \tfrenderfigure{gameops}{G4,G5,G6}
+    \caption{%
+        $\printgame{gm4}$ adds the guess $\fpguess$
         and the flag $\badev$ without affecting the output;
         $\printgame{gm5}$ adds line $38$; and $\printgame{gm6}$ moves the
         choice of $\fpguess$ and of the challenge into
@@ -143,5 +156,6 @@
         $\HT[\bot] = \bot$, which is immaterial since line $38$ is reached
         only after $\badev$ has been set and is identical in
         $\printgame{gm5}$ and $\printgame{gm6}$.%
-    }\label{fig:games}
+    }\label{fig:games2}
 \end{figure}
+

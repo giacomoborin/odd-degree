@@ -80,7 +80,7 @@ components have a fixed length.
 \begin{proof}
     We use code-based game playing~\cite{EC:BelRog06}, following the proof
     of~\cite[Lemma~3.5]{EC:AABN02}; the games are given in
-    Figure~\ref{fig:games} and are the following.
+    \Cref{fig:games1,fig:games2} and are the following.
     \begin{games}
         \game{gm0} The \EUFCMA game of $\SIG[\Sigma]$, with a lazily sampled
         random oracle.
@@ -260,7 +260,7 @@ components have a fixed length.
     From now on the game does not use the witness: it is entirely determined by
     $x$, by $\numOSign$ hints, and by the code of $\Sim$. It remains to turn
     $\adv$ into an impersonator, which is done by the guessing argument
-    of~\cite{EC:AABN02}; we recall it in Figure~\ref{fig:games}, in the
+    of~\cite{EC:AABN02}; we recall it in Figure~\Cref{fig:games1,fig:games2}, in the
     order that suits us.
 
     Game $\printgame{gm4}$ is game $\printgame{gm3}$ with bookkeeping added to

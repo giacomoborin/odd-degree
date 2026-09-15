@@ -4,44 +4,24 @@
 
 \subsection{A hint-aware Fiat--Shamir reduction}\label{sec:fs-hints}
 
-The security statement of~\cite[Theorem~1]{C:ABDPW25} is obtained by composing
+The security statement of \Cref{thm:abdpw} is obtained by composing
 three results:
 \begin{itemize}
-    \item~\cite[Lemma~3.5]{EC:AABN02}, reduces the \EUFCMA security of $\SIG[\Sigma]$ to the \textsf{IMP-PA} security of $\Sigma$ at the price of a multiplicative factor $\numRO+1$; 
-    \item~\cite[Lemma~3.1]{C:ABDPW25} then replaces the transcript oracle of the \textsf{IMP-PA} game by the hint-assisted simulator, at the price of an additive $\hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\cdot, \numOSign}$ term;
-    \item~\cite[Lemma~3.2]{C:ABDPW25} that concludes by special soundness.
+    \item \Cref{lem:aabn} reduces the \EUFCMA security of $\SIG[\Sigma]$ to the \IMPPA security of $\Sigma$ at the price of a multiplicative factor $\numRO+1$; 
+    \item \Cref{lem:hint-imppa} then replaces the transcript oracle of the \IMPPA game by the hint-assisted simulator of \Cref{def:hint-hvzk}, at the price of an additive $\hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\cdot, \numOSign}$ term;
+    \item \Cref{lem:ss-hints} that concludes by special soundness.
 \end{itemize}
-Because the second step is applied \emph{inside} the first one, the hint-assisted \textsf{wHVZK} advantage ends up being multiplied by $\numRO+1$.
+Because the second step is applied \emph{inside} the first one, the hint-assisted \wHVZK advantage ends up being multiplied by $\numRO+1$.
 
-This is an artefact of the modularisation rather than of the reduction: the transcript oracle of the \textsf{IMP-PA} game is only ever used to answer the signing queries of the forger, and there are $\numOSign$ of those, not $\numRO$.
+This is an artefact of the modularisation rather than of the reduction: the transcript oracle of the \IMPPA game is only ever used to answer the signing queries of the forger, and there are $\numOSign$ of those, not $\numRO$.
 In this section we prove a single lemma that performs the two steps in the opposite order, so that in the resulting bound $\hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\cdot, \numOSign}$ is a purely additive term.
 
-\paragraph{Preliminaries.}
-Throughout, $\Sigma = (\Prover_1, \Prover_2, \Verif)$ is a $\Sigma$-protocol for a relation $R$ with challenge space $\cC$, the family $\hintdistr = \set{\hintdistr_x}_x$ is a hint distribution for $R$ (\cite[Definition~3. 1]{C:ABDPW25}), and $\Sim$ is a $\hintdistr$-hint-assisted simulator for $\Sigma$ (\cite[Definition~3. 2]{C:ABDPW25}). 
-We write $\SIG[\Sigma]$ for the Fiat--Shamir signature scheme obtained from $\Sigma$, in which the
-challenge of a signature on $\msg$ under the public key $\pk = x$ is computed as
-$\chall \gets \RO(\com \concat x \concat \msg)$.
-
-For a game $\bG$ we write $\bG^\adv \Rightarrow 1$ for the event that the game outputs $1$ when run with $\adv$, and for $4 \leq i \leq 6$ we let $\goodev_i$ be the event that the $i$-th game never sets $\badev$.
-Recall that two games are \emph{identical-until-$\badev$} if their code differs only in statements that follow the setting of the flag to \btrue, and recall the two standard consequences of this~\cite{EC:BelRog06}: 
-\begin{itemize}
-    \item for identical-until-$\badev$ games $\bG, \bG'$ and any adversary $\adv$, \begin{equation}\label{eq:fundamental} \abs{\Pr[\bG^\adv \Rightarrow 1] - \Pr[\bG'^\adv \Rightarrow 1]} \leq \Pr[\bG^\adv \text{ sets the flag}], \end{equation} where the right-hand side may equally be taken to be $\Pr[\bG'^\adv \text{ sets the flag}]$, since identical-until-$\badev$ games set the flag with the same probability; 
-    \item and, denoting by $\goodev, \goodev'$ the events that the flag is never set, \begin{equation}\label{eq:good} \Pr[\bG^\adv \Rightarrow 1 \wedge \goodev] = \Pr[\bG'^\adv \Rightarrow 1 \wedge \goodev']. \end{equation}
-\end{itemize}
-
-Finally we write 
-\begin{equation}
-  \hintimppaadv{\Sigma}{\hintdistr}{\bdv}{\numOSign} \defeq
-  \Pr\left[\hintdistr\text{-}\mathsf{hint}\text{-}\mathsf{IMP}\text{-}\mathsf{PA}_\Sigma(\bdv, \numOSign) = 1\right]
-\end{equation}
-for the advantage of a two-stage adversary $\bdv = (\bdv_1, \bdv_2)$ in the $\hintdistr$-hint-\textsf{IMP-PA} game of~\cite[Definition~3.5 and Game~3]{C:ABDPW25}.
-Note that, unlike in the \textsf{IMP-PA} game, $\bdv$ has \emph{no} access to a transcript oracle, and that this game is not in the random oracle model: an adversary that needs a random oracle simulates it internally.
 
 \paragraph{Statement.} 
 
 \begin{lemma}[Hint-aware Fiat--Shamir]\label{lem:fs-hints}
-    Let $(R, \hintdistr)$ be a relation with hints, let $\Sigma$ be a $\Sigma$-protocol for $R$ with challenge space $\cC$, and let $\Sim$ be a $\hintdistr$-hint-assisted simulator for $\Sigma$.
-    For any PPT algorithm $\adv$ against the \EUFCMA security of $\SIG[\Sigma]$ making at most $\numRO$ queries to $\RO$ and at most $\numOSign$ queries to $\OSign$, there exist a two-stage PPT algorithm $\bdv = (\bdv_1, \bdv_2)$ and a PPT algorithm $\ddv$ such that
+    Let $(R, \hintdistr)$ be a relation with hints (\Cref{def:hint-distr}), let $\Sigma$ be a $\Sigma$-protocol for $R$ with challenge space $\cC$, and let $\Sim$ be a $\hintdistr$-hint-assisted simulator for $\Sigma$ (\Cref{def:hint-hvzk}).
+    For any PPT algorithm $\adv$ against the \EUFCMA security of the Fiat--Shamir signature $\SIG[\Sigma]$ of \Cref{def:fs} making at most $\numRO$ queries to $\RO$ and at most $\numOSign$ queries to $\OSign$, there exist a two-stage PPT algorithm $\bdv = (\bdv_1, \bdv_2)$ and a PPT algorithm $\ddv$ such that
     \begin{multline} 
         \Advantage{\EUFCMA}{\SIG[\Sigma]}(\adv) \leq (\numRO + 1)\cdot \hintimppaadv{\Sigma}{\hintdistr}{\bdv}{\numOSign} + \\ 
         + \hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\ddv, \numOSign}  + (\numRO + \numOSign + 1)\,\numOSign \cdot \minentropy{\Sigma}.
@@ -51,7 +31,7 @@ Note that, unlike in the \textsf{IMP-PA} game, $\bdv$ has \emph{no} access to a 
 \end{lemma}
 
 \begin{proof}
-    We use code-based game playing~\cite{EC:BelRog06}, following the proof of~\cite[Lemma~3.5]{EC:AABN02}; 
+    We use code-based game playing~\cite{EC:BelRog06}, following the proof of \Cref{lem:aabn} given in~\cite{EC:AABN02}; 
     the games are summarized in \Cref{fig:games}.
     \begin{figure}
         \centering 
@@ -61,7 +41,7 @@ Note that, unlike in the \textsf{IMP-PA} game, $\bdv$ has \emph{no} access to a 
     \end{figure}
 
 \subsubsection*{Normalising the forger.}
-Exactly as in the proof of~\cite[Lemma~3.5]{EC:AABN02}, we replace $\adv$
+Exactly as in the proof of \Cref{lem:aabn} in~\cite{EC:AABN02}, we replace $\adv$
 by a forger $\adv'$ of essentially the same running time, making at most one
 extra $\RO$ query, with
 $\Advantage{\EUFCMA}{\SIG[\Sigma]}(\adv) \leq
@@ -106,7 +86,7 @@ properties, where $x$ denotes the public key that $\adv'$ receives:
     \centering 
     \tfrendergame[diff=G2]{gameops}{G3}
     \caption{Reduction $\ddv$ from 
-        \tfgamename{gameops}{G2} to \tfgamename{gameops}{G3}, which uses the distinguisher $\ddv$ to turn the forger $\adv$ into a hint-assisted \textsf{wHVZK} distinguisher.
+        \tfgamename{gameops}{G2} to \tfgamename{gameops}{G3}, which uses the distinguisher $\ddv$ to turn the forger $\adv$ into a hint-assisted \wHVZK distinguisher.
     }\label{fig:reduction}
 \end{figure}
 
@@ -124,7 +104,7 @@ properties, where $x$ denotes the public key that $\adv'$ receives:
 \input{gameops/commentary/G6.tex}
 
 \subsubsection*{The impersonator.}
-Game $\tfgamename{gameops}{G6}$ is exactly the simulation carried out by the following two-stage adversary $\bdv = (\bdv_1, \bdv_2)$ against the $\hintdistr$-hint-\textsf{IMP-PA} security of $\Sigma$.
+Game $\tfgamename{gameops}{G6}$ is exactly the simulation carried out by the following two-stage adversary $\bdv = (\bdv_1, \bdv_2)$ against the $\hintdistr$-\hintIMPPA security of $\Sigma$ (\Cref{def:hint-imppa}).
 On input a statement $x$ and hints $\hint_1 \until \hint_\numOSign \gets \hintdistr_x$, the algorithm $\bdv_1$ computes $\pi_i \gets \Sim(x, \hint_i)$ for $i = 1 \until \numOSign$, draws $\fpguess \sample \set{1 \until \numRO+1}$, and runs $\adv$ on $\pk = x$, answering its queries as in $\tfgamename{gameops}{G6}$, until $\adv$ makes its $\fpguess$-th fresh $\RO$ query. 
 
 It parses that query as $\com^* \concat x \concat \msg^*$ and outputs $\com^*$ together with the state of the simulation. 
@@ -145,14 +125,14 @@ Chaining all the game hops gives the claim.
 \subsection{The improved \EUFCMA bound}\label{sec:eufcma-gen}
 
 Combining Lemma~\ref{lem:fs-hints} with the special-soundness step
-of~\cite[Lemma~3.2]{C:ABDPW25} we obtain the announced generalisation
-of~\cite[Theorem~1]{C:ABDPW25}.
+of \Cref{lem:ss-hints} we obtain the announced generalisation
+of \Cref{thm:abdpw}.
 
 \begin{theorem}\label{thm:EUFCMA-gen}
     Let $(R, \hintdistr)$ be a relation with hints.
     Let $\Sigma$ be a $\Sigma$-protocol for the relation $R$ that has challenge
     space $\cC$ and is special-sound with respect to a soundness relation
-    $\tilde{R}$.
+    $\tilde{R}$, in the sense of \Cref{def:sound-rel}.
     Additionally, let $\Sim$ be a $\hintdistr$-hint-assisted simulator for
     $\Sigma$.
     For any PPT algorithm $\adv$ against the \EUFCMA security of $\SIG[\Sigma]$
@@ -184,7 +164,7 @@ of~\cite[Theorem~1]{C:ABDPW25}.
         \end{aligned}
     \]
     Since $\Sigma$ is special sound with respect to $\tilde{R}$,
-    \cite[Lemma~3.2]{C:ABDPW25} applied to the two-stage adversary $\bdv$
+    \Cref{lem:ss-hints} applied to the two-stage adversary $\bdv$
     produces an expected polynomial time algorithm $\cE$ for the relation with
     hints $(\tilde{R}, \hintdistr)$ such that
     \[
@@ -193,7 +173,7 @@ of~\cite[Theorem~1]{C:ABDPW25}.
         + \frac{1}{\abs{\cC}}.
     \]
     Substituting gives the claim. If a strict PPT algorithm is required, one
-    applies~\cite[Corollary~3.1]{C:ABDPW25} to $\cE$: this yields a PPT algorithm
+    applies \Cref{cor:exp-to-ppt} to $\cE$: this yields a PPT algorithm
     $\cE'$ with $\hintreladv{\tilde{R}}{\hintdistr}{\cE}{\numOSign} \leq 2 \cdot
     \hintreladv{\tilde{R}}{\hintdistr}{\cE'}{\numOSign}$, so that the first term
     of the bound becomes $(\numRO+1)\bigl(2 \cdot
@@ -202,21 +182,10 @@ of~\cite[Theorem~1]{C:ABDPW25}.
     probability of $\cE$ is the inverse of a polynomial. \qed
 \end{proof}
 
-\begin{remark}[Comparison with~{\cite[Theorem~1]{C:ABDPW25}}]\label{rem:comparison}
-    The bound of~\cite[Theorem~1]{C:ABDPW25} reads
-    \[
-        \begin{aligned}
-            \Advantage{\EUFCMA}{\SIG[\Sigma]}(\adv)
-            &\leq (\numRO+1)\cdot
-            \left(\hintreladv{\tilde{R}}{\hintdistr}{\cE}{\numOSign}
-            + \hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\bdv, \numOSign}
-            + \frac{1}{\abs{\cC}}\right) \\
-            &\phantom{\leq ~}
-            + (\numRO+\numOSign+1)\numOSign\cdot\minentropy{\Sigma}.
-        \end{aligned}
-    \]
-    Theorem~\ref{thm:EUFCMA-gen} improves on it by taking the hint-assisted
-    \textsf{wHVZK} term out of the factor $\numRO+1$; all the other terms, the
+\begin{remark}[Comparison with \Cref{thm:abdpw}]\label{rem:comparison}
+    Theorem~\ref{thm:EUFCMA-gen} improves on the bound~\eqref{eq:abdpw} of
+    \Cref{thm:abdpw} by taking the hint-assisted
+    \wHVZK term out of the factor $\numRO+1$; all the other terms, the
     number of hints and the running times of the constructed algorithms are
     unchanged, so the improvement comes for free. It matters whenever the
     hint-assisted simulator is only \emph{statistically} close to the honest
@@ -227,7 +196,7 @@ of~\cite[Theorem~1]{C:ABDPW25}.
     this branch contributes a term $\numOSign/\epsilon$ to
     $\hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\ddv, \numOSign}$ on top of the terms
     that are already present in the even-degree case. In the bound
-    of~\cite[Theorem~1]{C:ABDPW25} that contribution would instead be
+    of \Cref{thm:abdpw} that contribution would instead be
     $(\numRO+1)\,\numOSign/\epsilon$. For the same security claim, $\log\epsilon$
     may therefore be smaller by $\log \numRO$ bits, which with the NIST bound
     $\numRO \leq 2^{64}$ is what makes the smaller values of $\log \epsilon$ in
@@ -244,7 +213,7 @@ of~\cite[Theorem~1]{C:ABDPW25}.
             random oracle at $\com \concat x \concat \msg$, which need not be
             uniform and independent of the rest, since $\adv$ may have queried
             that point before. The experiments $\Real_\Sigma$ and
-            $\HintSim_\Sigma$ of~\cite[Experiment~2]{C:ABDPW25} produce
+            $\HintSim_\Sigma$ of \Cref{fig:hint-hvzk} produce
             transcripts with \emph{independent uniform} challenges, so they can
             only be plugged in once the signing oracle has been made to sample
             the challenge itself and to reprogram the random oracle accordingly.
@@ -254,9 +223,9 @@ of~\cite[Theorem~1]{C:ABDPW25}.
             the factor $\numRO+1$.
     \end{enumerate}
     In particular, Lemma~\ref{lem:fs-hints} cannot be obtained by composing
-    \cite[Lemma~2.2]{C:ABDPW25} with \cite[Lemma~3.1]{C:ABDPW25} as black boxes:
+    \Cref{lem:aabn} with \Cref{lem:hint-imppa} as black boxes:
     the game hop has to be inserted \emph{inside} the proof
-    of~\cite[Lemma~3.5]{EC:AABN02}, between the games that isolate the
+    of \Cref{lem:aabn} given in~\cite{EC:AABN02}, between the games that isolate the
     reprogramming failure and the games that perform the guess. As a by-product,
     the min-entropy of the \emph{simulated} commitment distribution is never
     needed: from $\tfgamename{gameops}{G1}$ on the signing oracle reprograms the random

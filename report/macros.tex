@@ -394,3 +394,55 @@
 \newif\ifgamelabels
 \gamelabelstrue
 \providecommand{\gline}[1]{\ifgamelabels\label{#1}\fi}
+
+
+% ======================================================================
+% Notation for the definitions and results imported from
+% \cite{C:ABDPW25} into preliminaries.tex.
+%
+% The same defensive pattern as above is used for every name that
+% cryptocode claims under one of the options loaded by the TeXFrog HTML
+% wrapper but not by the paper (\usepackage[]{cryptocode}); a plain
+% \newcommand would clash in the browser, a plain \providecommand would
+% silently leave cryptocode's own -- differently typeset -- version in
+% place there.
+% ======================================================================
+
+\providecommand{\negl}{}\renewcommand{\negl}{\ensuremath{\mathsf{negl}}}
+
+% Statements, witnesses and hints
+\newcommand{\cX}{\mathcal{X}}
+\newcommand{\cW}{\mathcal{W}}
+\newcommand{\cS}{\mathcal{S}}
+\newcommand{\HintSet}{\ensuremath{\mathsf{HintSet}}}
+\newcommand{\state}{\ensuremath{\mathsf{st}}}
+
+% Distributions
+\newcommand{\statdist}[2]{\ensuremath{\Delta\left(#1, #2\right)}}
+\newcommand{\unifover}[1]{\ensuremath{\mathcal{U}(#1)}}
+
+% Signature schemes and the Fiat--Shamir transform
+\newcommand{\Sign}{\ensuremath{\mathsf{Sign}}}
+\newcommand{\Sigscheme}{\ensuremath{\mathsf{S}}}
+\newcommand{\FS}[1]{\ensuremath{\mathsf{FS}[#1]}}
+
+% Names of the security notions, so that the games, the advantage macros
+% and the prose always spell them the same way.
+\newcommand{\disttxt}{\ensuremath{\mathsf{dist}}}
+\newcommand{\reltxt}{\ensuremath{\mathsf{rel}}}
+\newcommand{\hvzktxt}{\ensuremath{\mathsf{wHVZK}}}
+\newcommand{\hinthvzktxt}{\ensuremath{\mathsf{hint}\text{-}\mathsf{wHVZK}}}
+\newcommand{\imppatxt}{\ensuremath{\mathsf{IMP}\text{-}\mathsf{PA}}}
+\newcommand{\hintimppatxt}{\ensuremath{\mathsf{hint}\text{-}\mathsf{IMP}\text{-}\mathsf{PA}}}
+\newcommand{\IMPPA}{\imppatxt\xspace}
+\newcommand{\hintIMPPA}{\hintimppatxt\xspace}
+\newcommand{\wHVZK}{\hvzktxt\xspace}
+\newcommand{\hintwHVZK}{\hinthvzktxt\xspace}
+
+% Advantages
+\newcommand{\distadv}[3]{%
+  \ensuremath{\mathsf{Adv}^{\disttxt}\left[#1, #2\right]\!\left(#3\right)}}
+\newcommand{\reladv}[2]{\ensuremath{\Advantage{\reltxt}{#1}(#2)}}
+\newcommand{\hvzkadv}[3]{\ensuremath{\Advantage{\hvzktxt}{#1,#2}(#3)}}
+\newcommand{\imppaadv}[2]{\ensuremath{\Advantage{\imppatxt}{#1}(#2)}}
+\newcommand{\eufcmaadv}[2]{\ensuremath{\Advantage{\EUFCMA}{#1}(#2)}}

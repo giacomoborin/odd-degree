@@ -1,0 +1,459 @@
+% All the definitions and results that Section~\ref{sec:fs-hints} and
+% Section~\ref{sec:eufcma-gen} build on are collected here, so that
+% extended_proof.tex can be read without the companion paper at hand.  Every
+% imported statement carries, in its name, the number it has in the source it
+% is taken from, which is the number that extended_proof.tex cites.
+
+\subsection{Notation}\label{sec:notation}
+
+We let $\secp \in \NN$ be the security parameter; all algorithms implicitly take
+the unary encoding $1^\secp$ as an input.
+We write PPT for ``probabilistic polynomial time in the length of the inputs'',
+$\poly(x_1 \until x_n)$ for an unspecified positive polynomial and
+$\negl(\secp)$ for an unspecified negligible function of $\secp$.
+When an algorithm $\adv$ has black-box query access to an oracle $\O$ we write
+$\adv^{\O}$.
+For $x, y \in \set{0,1}^*$ we write $x \concat y$ for their concatenation.
+
+For a probability distribution $D$ we write $x \gets D$ for sampling $x$
+from $D$; for a finite set $S$ we write $\unifover{S}$ for the uniform
+distribution over $S$ and $x \sample S$ for sampling from $\unifover{S}$.
+The statistical distance between two distributions $D_0, D_1$ over a finite set
+$S$ is
+\begin{equation}
+    \statdist{D_0}{D_1} \defeq
+    \frac{1}{2} \sum_{s \in S} \abs{\Pr[D_0 = s] - \Pr[D_1 = s]},
+\end{equation}
+and for an algorithm $\adv$ outputting a bit we write
+\begin{equation}
+    \distadv{D_0}{D_1}{\adv} \defeq
+    \abs{\Pr[1 \gets \adv(x) \mid x \gets D_0] - \Pr[1 \gets \adv(x) \mid x \gets D_1]}
+\end{equation}
+for its advantage in distinguishing $D_0$ from $D_1$.
+Recall that $\distadv{D_0}{D_1}{\adv} \leq \statdist{D_0}{D_1}$ for every
+$\adv$, with equality for an unbounded $\adv$~\cite[Proposition~2.3]{C:ABDPW25}.
+
+\subsection{Relations and \texorpdfstring{$\Sigma$}{Sigma}-protocols}\label{sec:sigma}
+
+A binary relation $R$ is a set of tuples $(x,w) \in \cX \times \cW \subseteq
+\set{0,1}^* \times \set{0,1}^*$; we call $x$ the \emph{statement} and $w$ the
+\emph{witness}.
+All relations we consider are NP relations and come equipped with an
+\emph{instance generator} $\Gen_R$, a PPT algorithm which on input $1^\secp$
+outputs a pair $(x,w) \in R$ with $\abs{x} = \poly(\secp)$.
+
+\begin{definition}[Hard relation, {\cite[Definition~2.1]{C:ABDPW25}}]\label{def:hard-rel}
+    A relation $R$ is a \emph{hard relation} if for all PPT algorithms $\adv$
+    \begin{equation}
+        \reladv{R}{\adv} \defeq
+        \Pr\left[(x, w^*) \in R \;\middle|\;
+            (x,w) \gets \Gen_R(1^\secp),\ w^* \gets \adv(x)\right]
+        = \negl(\secp).
+    \end{equation}
+\end{definition}
+
+\begin{definition}[$\Sigma$-protocol, {\cite[Definition~2.2]{C:ABDPW25}}]\label{def:sigma}
+    A \emph{$\Sigma$-protocol} for a relation $R$ is a $3$-message interactive
+    protocol between a prover and a verifier, given by a tuple of PPT algorithms
+    $\Sigma = (\Prover_1, \Prover_2, \Verif)$, as follows.
+    \begin{enumerate}
+        \item On input $(x,w) \in R$ the prover runs $(\com, \state) \gets
+            \Prover_1(x,w)$, obtaining a \emph{commitment} $\com$ and the state
+            $\state$ needed for the response, and sends $\com$ to the verifier.
+        \item The verifier samples a \emph{challenge} $\chall \sample \cC$
+            uniformly from the challenge space $\cC$ and sends it to the prover.
+        \item The prover replies with the \emph{response} $\rsp \gets
+            \Prover_2(\state, \chall)$.
+        \item The verifier runs $b \gets \Ver_\Sigma(x, \com, \chall, \rsp)$ and
+            accepts if and only if $b = 1$.
+    \end{enumerate}
+    We always assume \emph{correctness}: an honest execution is accepted except
+    with probability $\negl(\secp)$.
+\end{definition}
+
+The protocol is \emph{weak honest-verifier zero-knowledge} (\wHVZK) if there is
+a PPT simulator producing transcripts $(\com, \chall, \rsp)$ that no PPT
+algorithm can distinguish from honest ones, the challenge being uniform in both
+cases~\cite[Definition~2.3]{C:ABDPW25}; \Cref{def:hint-hvzk} below is the
+hint-assisted relaxation of this notion that we shall actually use.
+
+\begin{definition}[MinEnt, {\cite[Definition~2.4]{C:ABDPW25}}]\label{def:minent}
+    $\Sigma$ has \emph{high commitment min-entropy} if
+    \begin{equation}
+        \minentropy{\Sigma} \defeq \max_{(x,w)} \max_{\com}
+        \Pr\left[\com = \com' \;\middle|\; (\com', \state) \gets \Prover_1(x,w)\right]
+        = \negl(\secp),
+    \end{equation}
+    where the first maximum ranges over the pairs that $\Gen_R(1^\secp)$ may
+    output.
+\end{definition}
+
+Note that $\minentropy{\Sigma}$ is a probability, not a number of bits: the
+actual min-entropy of the commitment is $-\log(\minentropy{\Sigma})$.
+
+\begin{definition}[Special soundness, {\cite[Definition~2.5]{C:ABDPW25}}]\label{def:ss}
+    $\Sigma$ is \emph{special sound} if, given a statement $x$ and two accepting
+    transcripts $(\com, \chall, \rsp)$ and $(\com, \chall', \rsp')$ for $x$ with
+    $\chall \neq \chall'$, one can compute in time $\poly(\abs{x})$ a witness
+    $w$ such that $(x,w) \in R$.
+\end{definition}
+
+For \sqisign{}, and more generally for the protocols we are interested in,
+special soundness only holds with respect to a \emph{different} relation, which
+is the reason for the following relaxation.
+
+\begin{definition}[Soundness relation, {\cite[Definition~3.4]{C:ABDPW25}}]\label{def:sound-rel}
+    Let $\Sigma$ be a $\Sigma$-protocol for the relation $R$.
+    A relation $\tilde{R} \subseteq \tilde{\cX} \times \tilde{\cW}$ is
+    \emph{compatible} with $R$ if $\cX = \tilde{\cX}$ and their instance
+    generators sample statements with the same distribution.
+    We say that $\Sigma$ is \emph{special sound with respect to a compatible
+    relation $\tilde{R}$} if from a statement $x$ and two accepting transcripts
+    $(\com, \chall, \rsp)$, $(\com, \chall', \rsp')$ with $\chall \neq \chall'$
+    one can compute in time $\poly(\abs{x})$ a witness $w^*$ with $(x, w^*) \in
+    \tilde{R}$.
+    In this case $\tilde{R}$ is called a \emph{soundness relation} for $\Sigma$.
+\end{definition}
+
+A $\Sigma$-protocol can be read as an identification scheme, the prover trying
+to convince the verifier that it knows a witness for the identity $x$.
+The relevant security notion is security against \emph{passive impersonation
+attacks}: the attacker may first eavesdrop on honest executions, modelled by the
+transcript oracle $\OTrans$ of \Cref{fig:imppa}, and then tries to impersonate
+the prover.
+
+\begin{figure}[htb]
+    \centering
+    \begin{pchstack}
+        \procedure[linenumbering]{$\imppatxt_\Sigma(\adv)$}{
+            (x, w) \gets \Gen_R(1^\secp) \\
+            (\com^*, \state^*) \gets \adv_1^{\OTrans_{x,w}}(x) \\
+            \chall^* \sample \cC \\
+            \rsp^* \gets \adv_2(\state^*, \chall^*) \\
+            \pcreturn \Ver_\Sigma(x, \com^*, \chall^*, \rsp^*)
+        }
+        \pchspace
+        \procedure[linenumbering]{$\OTrans_{x,w}()$}{
+            (\com, \state) \gets \Prover_1(x, w) \\
+            \chall \sample \cC \\
+            \rsp \gets \Prover_2(\state, \chall) \\
+            \pcreturn (\com, \chall, \rsp)
+        }
+    \end{pchstack}
+    \caption{The $\imppatxt_\Sigma$ game of~\cite[Game~1]{C:ABDPW25}, played by a
+        two-stage adversary $\adv = (\adv_1, \adv_2)$.}\label{fig:imppa}
+\end{figure}
+
+\begin{definition}[\IMPPA, {\cite[Definition~2.7]{C:ABDPW25}}]\label{def:imppa}
+    $\Sigma$ is secure under passive impersonation attacks (\IMPPA) if for all
+    PPT two-stage algorithms $\adv = (\adv_1, \adv_2)$
+    \begin{equation}
+        \imppaadv{\Sigma}{\adv} \defeq \Pr[\imppatxt_\Sigma(\adv) = 1]
+        = \negl(\secp),
+    \end{equation}
+    where $\imppatxt_\Sigma$ is the game of \Cref{fig:imppa}.
+\end{definition}
+
+\subsection{Signature schemes in the ROM}\label{sec:sig-rom}
+
+In the random oracle model (ROM) all algorithms are given black-box query access
+to the random oracle $\RO$, implementing a uniformly random function
+$\set{0,1}^* \to \cC$; we usually omit the dependency on $\RO$ from the
+notation.
+
+\begin{definition}[Signature scheme, {\cite[Definition~2.8]{C:ABDPW25}}]\label{def:sigscheme}
+    A \emph{signature scheme} in the ROM for a message space $M$ is a tuple of
+    PPT algorithms $\Sigscheme = (\Gen, \Sign, \Ver)$ where $\Gen(1^\secp)$
+    outputs a key pair $(\pk, \sk)$, $\Sign(\sk, \msg)$ outputs a signature
+    $\sig$ for $\msg \in M$, and $\Ver(\pk, \msg, \sig)$ outputs $1$ (accept) or
+    $0$ (reject).
+    Correctness requires that honestly generated signatures verify except with
+    probability $\negl(\secp)$.
+\end{definition}
+
+\begin{figure}[htb]
+    \centering
+    \begin{pchstack}
+        \procedure[linenumbering]{$\EUFCMA_\Sigscheme(\adv)$}{
+            (\pk, \sk) \gets \Gen(1^\secp) \\
+            \Qset \coloneqq \emptyset \\
+            (\msg^*, \sig^*) \gets \adv^{\OSign}(\pk) \\
+            \pcif \Ver(\pk, \msg^*, \sig^*) = 1 \wedge \msg^* \notin \Qset \pcthen \pcreturn 1 \\
+            \pcreturn 0
+        }
+        \pchspace
+        \procedure[linenumbering]{$\OSign(\msg)$}{
+            \sig \gets \Sign(\sk, \msg) \\
+            \Qset \coloneqq \Qset \cup \set{\msg} \\
+            \pcreturn \sig
+        }
+    \end{pchstack}
+    \caption{The $\EUFCMA_\Sigscheme$ game of~\cite[Game~2]{C:ABDPW25}.}\label{fig:eufcma}
+\end{figure}
+
+\begin{definition}[\EUFCMA, {\cite[Definition~2.9]{C:ABDPW25}}]\label{def:eufcma}
+    A signature scheme $\Sigscheme$ satisfies \emph{existential unforgeability
+    under chosen message attacks} (\EUFCMA) if for all PPT random-oracle
+    algorithms $\adv$
+    \begin{equation}
+        \eufcmaadv{\Sigscheme}{\adv} \defeq
+        \Pr[\EUFCMA_\Sigscheme(\adv) = 1] = \negl(\secp),
+    \end{equation}
+    where $\EUFCMA_\Sigscheme$ is the game of \Cref{fig:eufcma}.
+\end{definition}
+
+\begin{definition}[Fiat--Shamir signature, {\cite[Definition~2.10]{C:ABDPW25}}]\label{def:fs}
+    Let $\Sigma$ be a $\Sigma$-protocol for a relation $R$ and let $M \subseteq
+    \set{0,1}^*$.
+    The signature scheme $\SIG[\Sigma]$ is defined as follows.
+    \begin{itemize}
+        \item $\Gen(1^\secp)$: sample $(x,w) \gets \Gen_R(1^\secp)$, set $\pk
+            \coloneqq x$ and $\sk \coloneqq (x,w)$.
+        \item $\Sign(\sk, \msg)$: generate a transcript $(\com, \chall, \rsp)$
+            with the prover algorithms of $\Sigma$, but computing the challenge
+            as $\chall \gets \RO(\com \concat x \concat \msg)$; output $\sig
+            \coloneqq (\com, \chall, \rsp)$.
+        \item $\Ver(\pk, \msg, \sig)$: accept if and only if $\sig = (\com,
+            \chall, \rsp)$ with $\Ver_\Sigma(x, \com, \chall, \rsp) = 1$ and
+            $\chall = \RO(\com \concat x \concat \msg)$.
+    \end{itemize}
+\end{definition}
+
+That is, $\SIG[\Sigma]$ is the Fiat--Shamir transform $\FS{\Sigma}$ of $\Sigma$,
+in which the challenge is obtained as $\chall \gets \RO(\com \concat x \concat
+\msg)$, with the relation modified to
+\begin{equation}
+    R^* = \set{(x \concat \msg, w) \;\middle|\; (x,w) \in R,\ \msg \in M}.
+\end{equation}
+The standard reduction of its unforgeability to the \IMPPA security of $\Sigma$
+is the result whose proof Section~\ref{sec:fs-hints} reorganises.
+
+\begin{lemma}[Fiat--Shamir from \IMPPA, {\cite[Lemma~3.5]{EC:AABN02}}, {\cite[Lemma~2.2]{C:ABDPW25}}]\label{lem:aabn}
+    For any PPT algorithm $\adv$ attacking the \EUFCMA security of
+    $\SIG[\Sigma]$ there exists a PPT two-stage algorithm $\bdv$ such that
+    \begin{equation}\label{eq:aabn}
+        \eufcmaadv{\SIG[\Sigma]}{\adv} \leq
+        (\numRO + 1) \cdot \imppaadv{\Sigma}{\bdv}
+        + (\numRO + \numOSign + 1)\,\numOSign \cdot \minentropy{\Sigma},
+    \end{equation}
+    where $\numRO$ and $\numOSign$ are upper bounds on the number of queries
+    that $\adv$ makes to $\RO$ and $\OSign$ respectively.
+    Furthermore, $\bdv$ makes at most $\numOSign$ queries to the transcript
+    oracle $\OTrans$.
+\end{lemma}
+
+\subsection{Fiat--Shamir with hints}\label{sec:fs-with-hints}
+
+The framework of~\cite{C:ABDPW25} captures the protocols, such as \sqisign{},
+whose simulator needs some additional information --- a \emph{hint} --- in order
+to produce a transcript.
+
+\begin{definition}[Hint distribution, {\cite[Definition~3.1]{C:ABDPW25}}]\label{def:hint-distr}
+    Let $R \subseteq \cX \times \cW$ be a relation.
+    A \emph{hint distribution} $\hintdistr$ for $R$ is a collection of
+    distributions $\hintdistr = \set{\hintdistr_x}_{x \in \cX}$, where
+    $\hintdistr_x \colon \HintSet_x \rightarrow [0,1]$ and the hints of $\HintSet_x$
+    are efficiently representable in $\abs{x}$.
+    The distribution $\hintdistr_x$ need not be efficiently sampleable.
+    We call $(R, \hintdistr)$ a \emph{relation with hints}.
+\end{definition}
+
+\begin{figure}[htb]
+    \centering
+    \begin{pchstack}
+        \procedure[linenumbering]{$\Real_\Sigma(1^\secp, \hintnum)$}{
+            (x, w) \gets \Gen_R(1^\secp) \\
+            \pcfor i = 1 \until \hintnum \pcdo \\
+            \pcind (\com_i, \state_i) \gets \Prover_1(x, w) \\
+            \pcind \chall_i \sample \cC \\
+            \pcind \rsp_i \gets \Prover_2(\state_i, \chall_i) \\
+            \pcind \pi_i \coloneqq (\com_i, \chall_i, \rsp_i) \\
+            \pcreturn (x, \pi_1 \until \pi_\hintnum)
+        }
+        \pchspace
+        \procedure[linenumbering]{$\HintSim_\Sigma(1^\secp, \hintnum, \Sim)$}{
+            (x, w) \gets \Gen_R(1^\secp) \\
+            \pcfor i = 1 \until \hintnum \pcdo \\
+            \pcind \hint_i \gets \hintdistr_x \\
+            \pcind \pi_i \gets \Sim(x, \hint_i) \\
+            \pcreturn (x, \pi_1 \until \pi_\hintnum)
+        }
+    \end{pchstack}
+    \caption{The hint-assisted \wHVZK experiment of~\cite[Experiment~2]{C:ABDPW25}.}
+    \label{fig:hint-hvzk}
+\end{figure}
+
+\begin{definition}[Hint-assisted \wHVZK, {\cite[Definition~3.2]{C:ABDPW25}}]\label{def:hint-hvzk}
+    Let $\Sigma$ be a $\Sigma$-protocol for a relation $R$ and let $\hintdistr$
+    be a hint distribution for $R$.
+    We say that $\Sigma$ is \emph{$\hintdistr$-hint-assisted \wHVZK} if there
+    exists a PPT algorithm $\Sim$, the \emph{$\hintdistr$-hint-assisted
+    simulator}, such that for all $\hintnum = \poly(\secp)$ and all PPT
+    algorithms $\ddv$
+    \begin{equation}
+        \hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\ddv, \hintnum} \defeq
+        \distadv{\Real_\Sigma(1^\secp, \hintnum)}%
+                {\HintSim_\Sigma(1^\secp, \hintnum, \Sim)}{\ddv}
+        = \negl(\secp),
+    \end{equation}
+    where $\Real_\Sigma$ and $\HintSim_\Sigma$ are the distributions defined in
+    \Cref{fig:hint-hvzk}.
+\end{definition}
+
+Since the reduction hands the hints to the adversary, the relation has to remain
+hard in their presence.
+
+\begin{definition}[Hard relation with hints, {\cite[Definition~3.3]{C:ABDPW25}}]\label{def:hard-rel-hints}
+    Let $R$ be a hard relation and let $\hintdistr$ be a hint distribution for
+    $R$.
+    The pair $(R, \hintdistr)$ is a \emph{hard relation with hints} if for all
+    PPT algorithms $\adv$ and all $\hintnum = \poly(\secp)$
+    \begin{equation}
+        \hintreladv{R}{\hintdistr}{\adv}{\hintnum} \defeq
+        \Pr\left[(x, w^*) \in R \;\middle|\;
+            \begin{aligned}
+                & (x,w) \gets \Gen_R(1^\secp), \\
+                & \hint_1 \until \hint_\hintnum \gets \hintdistr_x, \\
+                & w^* \gets \adv(x, \hint_1 \until \hint_\hintnum)
+            \end{aligned}
+        \right] = \negl(\secp).
+    \end{equation}
+\end{definition}
+
+The intermediate notion through which the reduction passes is a
+\emph{non-interactive} variant of \IMPPA: the adversary no longer has a
+transcript oracle, but is given hints from which it can simulate transcripts
+itself.
+
+\begin{figure}[htb]
+    \centering
+    \procedure[linenumbering]{$\hintdistr\text{-}\hintimppatxt_\Sigma(\adv, \hintnum)$}{
+        (x, w) \gets \Gen_R(1^\secp) \\
+        \hint_1 \until \hint_\hintnum \gets \hintdistr_x \\
+        (\com, \state) \gets \adv_1(x, \hint_1 \until \hint_\hintnum) \\
+        \chall \sample \cC \\
+        \rsp \gets \adv_2(\state, \chall) \\
+        \pcreturn \Ver_\Sigma(x, \com, \chall, \rsp)
+    }
+    \caption{The $\hintdistr$-$\hintimppatxt_\Sigma$ game
+        of~\cite[Game~3]{C:ABDPW25}.}\label{fig:hint-imppa}
+\end{figure}
+
+\begin{definition}[\hintIMPPA, {\cite[Definition~3.5]{C:ABDPW25}}]\label{def:hint-imppa}
+    Let $(R, \hintdistr)$ be a relation with hints and let $\Sigma$ be a
+    $\Sigma$-protocol for $R$.
+    We say that $\Sigma$ is secure under $\hintdistr$-hint-assisted passive
+    impersonation attacks ($\hintdistr$-\hintIMPPA) if for all $\hintnum =
+    \poly(\secp)$ and all PPT two-stage algorithms $\adv = (\adv_1, \adv_2)$
+    \begin{equation}\label{eq:hint-imppa-adv}
+        \hintimppaadv{\Sigma}{\hintdistr}{\adv}{\hintnum} \defeq
+        \Pr\left[\hintdistr\text{-}\hintimppatxt_\Sigma(\adv, \hintnum) = 1\right]
+        = \negl(\secp),
+    \end{equation}
+    where $\hintdistr$-$\hintimppatxt_\Sigma$ is the game of
+    \Cref{fig:hint-imppa}.
+\end{definition}
+
+Note that, unlike in the \IMPPA game, $\adv$ has \emph{no} access to a
+transcript oracle, and that this game is not in the random oracle model: an
+adversary that needs a random oracle simulates it internally.
+
+The three results below are the ones that Section~\ref{sec:fs-hints} and
+Section~\ref{sec:eufcma-gen} reorganise and reuse.
+\Cref{lem:hint-imppa} is the step that trades the transcript oracle for the
+hint-assisted simulator, and \Cref{lem:ss-hints} the step that concludes by
+special soundness.
+
+\begin{lemma}[Hint-assisted transcripts, {\cite[Lemma~3.1]{C:ABDPW25}}]\label{lem:hint-imppa}
+    Let $(R, \hintdistr)$ be a relation with hints, let $\Sigma$ be a
+    $\Sigma$-protocol for $R$ and let $\Sim$ be a $\hintdistr$-hint-assisted
+    simulator for $\Sigma$.
+    For any two-stage PPT algorithm $\adv = (\adv_1, \adv_2)$ against the
+    \IMPPA security of $\Sigma$ there exist a two-stage PPT algorithm $\bdv$ and
+    a PPT algorithm $\ddv$ such that
+    \begin{equation}
+        \imppaadv{\Sigma}{\adv} \leq
+        \hintimppaadv{\Sigma}{\hintdistr}{\bdv}{\hintnum}
+        + \hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\ddv, \hintnum},
+    \end{equation}
+    where $\hintnum$ is an upper bound on the number of queries that $\adv_1$
+    makes to $\OTrans$.
+\end{lemma}
+
+\begin{lemma}[Special soundness with hints, {\cite[Lemma~3.2]{C:ABDPW25}}]\label{lem:ss-hints}
+    Let $(R, \hintdistr)$ be a relation with hints and let $\Sigma$ be a
+    $\Sigma$-protocol for $R$ with challenge space $\cC$ that is special sound
+    with respect to a soundness relation $\tilde{R}$.
+    For any two-stage PPT algorithm $\adv = (\adv_1, \adv_2)$ playing the
+    $\hintIMPPA$ game for $\Sigma$ with $\hintnum$ hints from $\hintdistr$,
+    there exists an expected polynomial time algorithm $\cE$ playing the game
+    for $(\tilde{R}, \hintdistr)$ such that
+    \begin{equation}
+        \hintimppaadv{\Sigma}{\hintdistr}{\adv}{\hintnum} \leq
+        \hintreladv{\tilde{R}}{\hintdistr}{\cE}{\hintnum} + \frac{1}{\abs{\cC}}.
+    \end{equation}
+    The expected running time of $\cE$ is about the same as that of the
+    knowledge extractor of $\Sigma$, which invokes $\adv$ twice in expectation.
+\end{lemma}
+
+\begin{corollary}[Expected to strict polynomial time, {\cite[Corollary~3.1]{C:ABDPW25}}]\label{cor:exp-to-ppt}
+    Let $\adv$ be an algorithm that runs in expected time $t$ with success
+    probability $\eps$.
+    Then there exists an algorithm $\bdv$ that runs in time at most $2t/\eps$
+    and succeeds with probability at least $\eps/2$.
+    In particular, if $t$ and $\eps^{-1}$ are polynomial in $\secp$, then $\bdv$
+    runs in polynomial time in $\secp$ and has non-negligible success
+    probability.
+\end{corollary}
+
+Chaining \Cref{lem:aabn}, \Cref{lem:hint-imppa} and \Cref{lem:ss-hints} gives the
+main theorem of the framework, which Theorem~\ref{thm:EUFCMA-gen} improves upon.
+
+\begin{theorem}[hint-rel reduces to \EUFCMA, {\cite[Theorem~1]{C:ABDPW25}}]\label{thm:abdpw}
+    Let $(R, \hintdistr)$ be a relation with hints.
+    Let $\Sigma$ be a $\Sigma$-protocol for $R$ that has challenge space $\cC$
+    and is special sound with respect to a soundness relation $\tilde{R}$, and
+    let $\Sim$ be a $\hintdistr$-hint-assisted simulator for $\Sigma$.
+    For any PPT algorithm $\adv$ against the \EUFCMA security of $\SIG[\Sigma]$
+    there exist a PPT algorithm $\bdv$ and an expected polynomial time algorithm
+    $\cE$ such that
+    \begin{equation}\label{eq:abdpw}
+        \begin{aligned}
+            \eufcmaadv{\SIG[\Sigma]}{\adv}
+            &\leq (\numRO+1)\cdot
+            \left(\hintreladv{\tilde{R}}{\hintdistr}{\cE}{\numOSign}
+            + \hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\bdv, \numOSign}
+            + \frac{1}{\abs{\cC}}\right) \\
+            &\phantom{\leq ~}
+            + (\numRO + \numOSign + 1)\,\numOSign \cdot \minentropy{\Sigma},
+        \end{aligned}
+    \end{equation}
+    where $\numRO$ and $\numOSign$ are upper bounds on the number of queries
+    that $\adv$ makes to $\RO$ and $\OSign$ respectively.
+\end{theorem}
+
+\subsection{Game-playing proofs}\label{sec:gameops}
+
+For a game $\bG$ we write $\bG^\adv \Rightarrow 1$ for the event that the game
+outputs $1$ when run with $\adv$, and for $4 \leq i \leq 6$ we let $\goodev_i$ be
+the event that the $i$-th game never sets $\badev$.
+Recall that two games are \emph{identical-until-$\badev$} if their code differs
+only in statements that follow the setting of the flag to \btrue, and recall the
+two standard consequences of this~\cite{EC:BelRog06}:
+\begin{itemize}
+    \item for identical-until-$\badev$ games $\bG, \bG'$ and any adversary
+        $\adv$,
+        \begin{equation}\label{eq:fundamental}
+            \abs{\Pr[\bG^\adv \Rightarrow 1] - \Pr[\bG'^\adv \Rightarrow 1]}
+            \leq \Pr[\bG^\adv \text{ sets the flag}],
+        \end{equation}
+        where the right-hand side may equally be taken to be $\Pr[\bG'^\adv
+        \text{ sets the flag}]$, since identical-until-$\badev$ games set the
+        flag with the same probability;
+    \item and, denoting by $\goodev, \goodev'$ the events that the flag is never
+        set,
+        \begin{equation}\label{eq:good}
+            \Pr[\bG^\adv \Rightarrow 1 \wedge \goodev]
+            = \Pr[\bG'^\adv \Rightarrow 1 \wedge \goodev'].
+        \end{equation}
+\end{itemize}

@@ -1,0 +1,10 @@
+This reduction from \tfgamename{gameops}{G2} to \tfgamename{gameops}{G3} feeds the transcripts using the Hint-assisted wHVZK from \cite[Expderiment 2]{C:ABDPW25}.
+Hence, by~\cite[Definition~3.2]{C:ABDPW25}, we have
+\begin{equation}\label{eq:g2g3}
+    \Pr[\tfgamename{gameops}{G2}^\adv \Rightarrow 1]
+    \leq \Pr[\tfgamename{gameops}{G3}^\adv \Rightarrow 1]
+    + \hinthvzkadv{\Sigma}{\hintdistr}{\Sim}{\ddv, \numOSign}.
+\end{equation}
+This is the step that differs from~\cite{C:ABDPW25}: the swap is performed on
+the \EUFCMA game itself and no guessing has taken place yet, so the loss is a
+single hint-assisted \textsf{wHVZK} advantage with $\numOSign$ hints.

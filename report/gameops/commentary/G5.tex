@@ -1,8 +1,6 @@
-Line $38$ is added: when the guess is wrong, $\chall^*$ is overwritten with
-$\HT[\QT[\fpguess]]$, so the verifier runs on the challenge sitting at the
-\emph{guessed} position rather than at the correct one.
-
-Line $38$ follows the setting of $\badev$ at line $37$, so
-$\tfgamename{gameops}{G4}$ and $\tfgamename{gameops}{G5}$ are
-identical-until-$\badev$ and the two games agree on the event that the output
-is $1$ and the flag is never set.
+Additionally overwrites $\chall^*$ with $\HT[\QT[\fpguess]]$ when $j \neq \fpguess$, that is, it runs the verifier on the challenge sitting at the \emph{guessed} position rather than at the correct one.
+This modification (line \ref{gm:fin-overwrite}) follows the setting of $\badev$ at line \ref{gm:fin-set-bad}, so $\tfgamename{gameops}{G4}$ and $\tfgamename{gameops}{G5}$ are identical-until-$\badev$:
+\begin{equation}\label{eq:g4g5}
+    \Pr[\tfgamename{gameops}{G4}^\adv \Rightarrow 1 \wedge \goodev_4]
+    = \Pr[\tfgamename{gameops}{G5}^\adv \Rightarrow 1 \wedge \goodev_5].
+\end{equation}

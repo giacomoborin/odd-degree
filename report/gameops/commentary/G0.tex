@@ -3,9 +3,10 @@ lazily sampled into a table $\HT$ and so that $\QT$ records, in order, the
 arguments of the \emph{fresh} $\RO$ queries of $\adv$. Queries answered from
 $\HT$ and reprogrammings performed by $\OSign$ are not recorded.
 
-Lines $23$--$26$ set $\chall_\sctr \coloneqq \HT[u]$ if that entry is defined
-and $\chall_\sctr \sample \cC$ otherwise; line $27$ then rewrites the same
-value and is a no-op in the first case. This is exactly the signing algorithm
-of $\SIG[\Sigma]$. Line $35$ reads $\HT[u^*]$ directly rather than calling
-$\RO$, which is harmless because the normalised forger has always queried
-that point.
+Lines \ref{gm:osign-sample-chal}-\ref{gm:osign-reuse-chal} are only used to define properly the use of the random oracle $\RO$ in the signing algorithm.
+So, this is exactly the signing algorithm of $\SIG[\Sigma]$:
+\begin{equation}\label{eq:g0}
+    \Pr[\tfgamename{gameops}{G0}^\adv \Rightarrow 1]
+    = \Advantage{\EUFCMA}{\SIG[\Sigma]}(\adv).
+\end{equation}
+

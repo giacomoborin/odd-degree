@@ -1,0 +1,172 @@
+% ======================================================================
+% TeXFrog source for the game chain of Lemma~\ref{lem:fs-hints}.
+%
+% This is the single source of truth for the pseudocode.  It feeds
+%   * the consolidated figure below (plain pdflatex, no extra tooling), and
+%   * the interactive HTML viewer:
+%         texfrog html serve gameops/gameops.tex
+%     (run from report/, with ../.venv activated).
+%
+% Line numbers are cryptocode's own automatic ones (`linenumbering`); what
+% is written by hand is a \gline{name} label at the head of every line the
+% proof needs to cite, so that \ref{name} always agrees with whatever
+% number cryptocode ends up printing for that line -- see notation.tex.
+% ======================================================================
+
+
+\tfpreamble{preamble.tex}
+\tfmacrofile{macros.tex}
+
+
+%%% Game roster.  Order fixes the meaning of ranges such as G3-G6.
+\tfgames{gameops}{G0, G1, G2, Red1, G3, G4, G5, G6}
+\tfgamename{gameops}{G0}{G_0}
+\tfgamename{gameops}{G1}{G_1}
+\tfgamename{gameops}{G2}{G_2}
+\tfgamename{gameops}{Red1}{\mathcal{D}}
+\tfgamename{gameops}{G3}{G_3}
+\tfgamename{gameops}{G4}{G_4}
+\tfgamename{gameops}{G5}{G_5}
+\tfgamename{gameops}{G6}{G_6}
+
+\tfreduction{gameops}{Red1}
+\tfrelatedgames{gameops}{Red1}{G2, G3}
+
+
+
+\tfdescription{gameops}{G0}{The $\sf EUFCMA$ game of $\SIG[\Sigma]$, with a lazily sampled random oracle.}
+\tfdescription{gameops}{G1}{The signing oracle overwrites the random-oracle table instead of re-using a stored value; $\badprog$ records this.}
+\tfdescription{gameops}{G2}{The honest transcripts are sampled eagerly, as in $\Real_\Sigma(1^\secp, \numOSign)$.}
+\tfdescription{gameops}{Red1}{The reduction \ddv to hint-assisted \textsf{wHVZK} that gets the hints from the Experiment.}
+\tfdescription{gameops}{G3}{The honest transcripts are replaced by hint-assisted simulated ones; from here on the witness is unused.}
+\tfdescription{gameops}{G4}{A guess $\fpguess$ of the index of the random-oracle query underlying the forgery is drawn; it does not influence the output.}
+\tfdescription{gameops}{G5}{When the guess is wrong, the verifier is run on the challenge at the guessed position.}
+\tfdescription{gameops}{G6}{The guess and the challenge move to $\mathbf{Initialize}$; this is the simulation run by the impersonator $\bdv$.}
+
+
+\tfcommentary{gameops}{G0}{gameops/commentary/G0.tex}
+\tfcommentary{gameops}{G1}{gameops/commentary/G1.tex}
+\tfcommentary{gameops}{G2}{gameops/commentary/G2.tex}
+\tfcommentary{gameops}{Red1}{gameops/commentary/Red1.tex}
+\tfcommentary{gameops}{G3}{gameops/commentary/G3.tex}
+\tfcommentary{gameops}{G4}{gameops/commentary/G4.tex}
+\tfcommentary{gameops}{G5}{gameops/commentary/G5.tex}
+\tfcommentary{gameops}{G6}{gameops/commentary/G6.tex}
+
+\begin{tfsource}{gameops}
+\begin{pchstack}
+%%%
+\begin{pcvstack}[boxed]
+\procedure[linenumbering, lnstart=000]{%
+    Game $G_i(\adv, \numOSign, \numRO)$ 
+    % \tfonly*{G0}{$\tfgamename{gameops}{G0}^\adv$}%
+    % \tfonly*{G1}{$\tfgamename{gameops}{G1}^\adv$}%
+    % \tfonly*{G2}{$\tfgamename{gameops}{G2}^\adv$}%
+    % \tfonly*{G3}{$\tfgamename{gameops}{G3}^\adv$}%
+    % \tfonly*{G4}{$\tfgamename{gameops}{G4}^\adv$}%
+    % \tfonly*{G5}{$\tfgamename{gameops}{G5}^\adv$}%
+    % \tfonly*{G6}{$\tfgamename{gameops}{G6}^\adv$}%
+% \tffigure*{Games with input $\adv$}%
+% \tfonly*{Red1}{Reduction $\Bdversary_1^{\OPRF}$}%
+}{
+  \gline{gm:init-bookkeeping} \Qset \coloneqq \emptyset; \; \hctr \coloneqq 0; \; \sctr \coloneqq 0 \\
+  \tfonly{G0-G2,G3-G6}{\gline{gm:init-gen} (x, w) \gets \Gen_R(1^\secp) \\ }
+  \tfonly{Red1}{\gline{gm:init-hvzk} x,\pi_1, \ldots, \pi_\numOSign \gets \text{Experiment 2} \\} 
+  \tfonly{G0-G1}{\gline{gm:bad-prog-init} \badprog \coloneqq \bfalse \\ }
+  \tfonly{G4-G6}{\gline{gm:bad-even-init} \badev \coloneqq \bfalse \\ }
+  \tfonly{G2,G3-G6}{\gline{gm:init-honest-loop} \pcfor i = 1 \until \numOSign \pcdo \\}
+  \tfonly{G2}{\gline{gm:init-honest-com-chal} \pcind (\com_i, \mathsf{st}_i) \gets \Prover_1(x, w); \; \chall_i \sample \cC \\}
+  \tfonly{G2}{\gline{gm:init-honest-resp} \pcind \rsp_i \gets \Prover_2(\mathsf{st}_i, \chall_i) \\}
+  \tfonly{G3-G6}{\gline{gm:init-hint-sim} \pcind \hint_i \gets \hintdistr_x \\}
+  \tfonly{G2}{\gline{gm:init-honest-trans} \pcind \pi_i \coloneqq (\com_i, \chall_i, \rsp_i) \\}
+  \tfonly{G3-G6}{\gline{gm:init-hint-trans} \pcind  \; \pi_i \gets \Sim(x, \hint_i) \\}
+  \tfonly{G4-G6}{\gline{gm:init-fp} \fpguess \sample \set{1 \until \numRO + 1} \\}
+  \tfonly{G6}{\gline{gm:init-chalcirc} \chall' \sample \cC \\}
+  \gline{gm:adv-run} \msg^*, \sig^* \gets \adv^{\RO, \OSign}(x) \\
+  \gline{gm:fin-parse} \pcparse \sig^* \text{ as } (\com^*, \chall^*, \rsp^*) \\
+  \gline{gm:fin-check-msg} \pcif \msg^* \in \Qset \pcthen \pcreturn 0 \\
+  \gline{gm:fin-ustar} u^* \coloneqq \com^* \concat x \concat \msg^* \\
+  \tfonly{G4,G5,G6}{\gline{gm:fin-findj} \text{let } j \text{ be the first such that } \QT[j] = u^* \\}
+  \gline{gm:fin-check-chal} \pcif \chall^* \neq \HT[u^*] \pcthen \pcreturn 0 \\
+  \tfonly{G4,G5,G6}{\gline{gm:fin-check-j} \pcif j \neq \fpguess \pcthen \\}
+  \tfonly{G4,G5,G6}{\gline{gm:fin-set-bad} \pcind \badev \coloneqq \btrue \\}
+  \tfonly{G5,G6}{\gline{gm:fin-overwrite} \pcind \chall^* \coloneqq \HT[\QT[\fpguess]] \\}
+  \gline{gm:fin-verify} \pcreturn \Ver_\Sigma(x, \com^*, \chall^*, \rsp^*)
+}
+\end{pcvstack}
+%%%
+\pchspace[0pt]
+\begin{pcvstack}[boxed]
+\procedure[linenumbering, lnstart=100]{$\RO(u)$}{
+  \gline{gm:ro-check} \pcif \HT[u] = \bot \pcthen \\
+  \gline{gm:ro-record} \pcind \hctr \coloneqq \hctr + 1; \; \QT[\hctr] \coloneqq u \\
+  \tfonly{G0,G1,G2,G3,G4,G5}{\gline{gm:ro-sample} \pcind \HT[u] \sample \cC \\}
+  \tfonly{G6}{\gline{gm:ro-plant} \pcind \pcif \hctr = \fpguess \pcthen \HT[u] \coloneqq \chall' \quad \pcelse \HT[u] \sample \cC \\}
+  \gline{gm:ro-return} \pcreturn \HT[u]
+}
+\pcvspace
+\procedure[linenumbering, lnstart = 200]{$\OSign(\msg)$}{
+  \gline{gm:osign-inc} \sctr \coloneqq \sctr + 1; \; \Qset \coloneqq \Qset \cup \set{\msg} \\
+  \tfonly{G0,G1}{\gline{gm:osign-prover1} (\com_\sctr, \mathsf{st}_\sctr) \gets \Prover_1(x, w) \\}
+  \tfonly{G2,G3,G4,G5,G6}{\gline{gm:osign-parse} \pcparse \pi_\sctr \text{ as } (\com_\sctr, \chall_\sctr, \rsp_\sctr) \\}
+  \gline{gm:osign-u} u \coloneqq \com_\sctr \concat x \concat \msg \\
+  \tfonly{G0,G1}{\gline{gm:osign-sample-chal} \chall_\sctr \sample \cC \\}
+  \tfonly{G0,G1}{\gline{gm:osign-check-defined} \pcif \HT[u] \neq \bot \pcthen \\}
+  \tfonly{G0,G1}{\gline{gm:osign-set-badprog} \pcind \badprog \coloneqq \btrue \\}
+  \tfonly{G0}{\gline{gm:osign-reuse-chal} \pcind \chall_\sctr \coloneqq \HT[u] \\}
+  \gline{gm:osign-program} \HT[u] \coloneqq \chall_\sctr \\
+  \tfonly{G0,G1}{\gline{gm:osign-resp} \rsp_\sctr \gets \Prover_2(\mathsf{st}_\sctr, \chall_\sctr) \\}
+  \gline{gm:osign-return} \pcreturn (\com_\sctr, \chall_\sctr, \rsp_\sctr)
+}
+\end{pcvstack}
+%%%
+\end{pchstack}
+\end{tfsource}
+
+% ----------------------------------------------------------------------
+% The consolidated figure that appears in the paper: ONE rendering of all
+% seven games. This is deliberate, not just tidier than two side-by-side
+% figures -- cryptocode's line numbers (and hence every \gline label
+% above) are local to a single \tfrenderfigure/\tfrendergame call, so a
+% label that fired in two different renderings would end up meaning two
+% different numbers depending on which one LaTeX happened to process
+% last. Rendering the whole chain once is what makes \ref{gm:...} safe to
+% use from the prose.
+% ----------------------------------------------------------------------
+% \begin{figure}[htb]
+%     \centering
+%     % Tighten the gutter between the two stacks and the gap after the line
+%     % numbers: at their defaults the figure is a few points wider than
+%     % \textwidth.  (\resizebox is not an option here -- cryptocode's stacks
+%     % contain vertical-mode material.)
+%     \renewcommand{\pclnspace}{0.4em}%
+%     \tfrenderfigure{gameops}{G0,G1,G2,G3,G4,G5,G6}
+%     \caption{%
+%         The games $\printgame{gm0}$--$\printgame{gm6}$ of the proof of
+%         Lemma~\ref{lem:fs-hints}, as a single listing: a line carrying no
+%         annotation belongs to every game, and a line annotated
+%         $\cmt \printgame{gm4}, \printgame{gm5}$ occurs only in the games
+%         named. We write $\pi_i \coloneqq (\com_i, \chall_i, \rsp_i)$ for
+%         the $i$-th transcript, as $\Real_\Sigma$ and $\HintSim_\Sigma$ do.
+%         %
+%         Reading the chain off the figure: $\printgame{gm0}$ is the \EUFCMA
+%         game of $\SIG[\Sigma]$; $\printgame{gm1}$ deletes line
+%         \ref{gm:osign-reuse-chal}, which is what makes the pair
+%         identical-until-$\badprog$; $\printgame{gm2}$ replaces the
+%         on-demand prover calls by the eagerly sampled transcripts of
+%         $\Real_\Sigma(1^\secp, \numOSign)$ and $\printgame{gm3}$ by those
+%         of $\HintSim_\Sigma(1^\secp, \numOSign, \Sim)$, after which the
+%         witness $w$ is no longer used; $\printgame{gm4}$ adds the guess
+%         $\fpguess$ and the flag $\badev$ without affecting the output;
+%         $\printgame{gm5}$ adds line \ref{gm:fin-overwrite}; and
+%         $\printgame{gm6}$ moves the choice of $\fpguess$ and of the
+%         challenge into $\mathbf{Initialize}$, planting the latter at the
+%         $\fpguess$-th fresh $\RO$ query.
+%         %
+%         If $\adv$ makes fewer than $\fpguess$ fresh $\RO$ queries then
+%         $\QT[\fpguess]$ is undefined at line \ref{gm:fin-overwrite}; we use
+%         the convention $\HT[\bot] = \bot$, which is immaterial since that
+%         line is reached only after $\badev$ has been set and is identical
+%         in $\printgame{gm5}$ and $\printgame{gm6}$.%
+%     }\label{fig:games}
+% \end{figure}

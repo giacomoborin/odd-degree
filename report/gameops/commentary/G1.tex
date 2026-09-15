@@ -1,10 +1,12 @@
-Obtained from $\tfgamename{gameops}{G0}$ by deleting the single line $26$: a
-signing query that hits an already defined table entry no longer re-uses the
-stored value, but overwrites it with the freshly sampled challenge
-$\chall_\sctr$.
+Obtained from $\tfgamename{gameops}{G0}$ by deleting the single line \ref{gm:osign-reuse-chal}: a signing query that hits an already defined table entry no longer re-uses the stored value, but overwrites it with the freshly sampled challenge $\chall_\sctr$.
 
-Line $26$ follows the setting of $\badprog$ at line $25$, so the two games
-are identical-until-$\badprog$. The commitment produced by $\Prover_1(x,w)$ is
+Line~\ref{gm:osign-program} follows the setting of $\badprog$ at line \ref{gm:osign-set-badprog}, so the two games are identical-until-$\badprog$. 
+The commitment produced by $\Prover_1(x,w)$ is
 independent of the message and of the history of the game, so the flag is set
-with probability at most
-$(\numRO + \numOSign + 1)\,\numOSign \cdot \minentropy{\Sigma}$.
+with probability at most $(\numRO + \numOSign + 1)\,\numOSign \cdot \minentropy{\Sigma}$.
+We have:
+\begin{align}\label{eq:g0g1}
+    \Pr[\tfgamename{gameops}{G0}^\adv \Rightarrow 1] 
+    & \leq \Pr[\tfgamename{gameops}{G1}^\adv \Rightarrow 1] + \Pr[\tfgamename{gameops}{G1}^\adv \text{ sets } \badprog] \\
+    & \leq \Pr[\tfgamename{gameops}{G1}^\adv \Rightarrow 1] + (\numRO + \numOSign + 1)\,\numOSign \cdot \minentropy{\Sigma}.
+\end{align}

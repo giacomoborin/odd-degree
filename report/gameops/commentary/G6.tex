@@ -1,15 +1,9 @@
-The guess $\fpguess$ and a challenge $\chall^\circ \sample \cC$ move to
-$\mathbf{Initialize}$ (lines $6$ and $7$), and $\chall^\circ$ becomes the
-answer to the $\fpguess$-th fresh $\RO$ query (line $12'$).
-
-This is a change of sampling order only: for every fixed value of $\fpguess$
-the answers to the fresh $\RO$ queries are independent uniform elements of
-$\cC$ in both games, so the joint distribution of $\fpguess$ and of the view of
-$\adv$ is unchanged.
-
-This game is exactly the simulation carried out by the impersonator $\bdv$ in
-the $\hintdistr$-hint-\textsf{IMP-PA} game: $\bdv_1$ runs $\adv$ until its
-$\fpguess$-th fresh $\RO$ query and outputs the commitment appearing in it;
-$\bdv_2$ receives $\chall^\circ$, plants it, resumes $\adv$ and returns the
-response contained in the forgery. Note that $\bdv$ needs neither a transcript
-oracle nor the witness: the $\numOSign$ hints and $\Sim$ suffice.
+Game $\tfgamename{gameops}{G6}$ finally draws the challenge $\chall' \sample \cC$ before calling the adversary $\adv$ in line~\ref{gm:adv-run}. 
+Also, $\chall'$ is given as input as the answer to the $\fpguess$-th fresh $\RO$ query. 
+This is a change of sampling order only.
+In $\tfgamename{gameops}{G5}$ the answers to the fresh $\RO$ queries are independent uniform elements of $\cC$ and $\fpguess$ is an independent uniform index; in $\tfgamename{gameops}{G6}$ for every fixed value of $\fpguess$, the answers to the fresh $\RO$ queries are again independent uniform elements of $\cC$. 
+Thus
+\begin{equation}\label{eq:g5g6}
+    \Pr[\tfgamename{gameops}{G5}^\adv \Rightarrow 1 \wedge \goodev_5]
+    = \Pr[\tfgamename{gameops}{G6}^\adv \Rightarrow 1 \wedge \goodev_6].
+\end{equation}

@@ -1,16 +1,25 @@
-Bookkeeping is added to $\mathbf{Finalize}$: an index
-$\fpguess \sample \set{1 \until \numRO+1}$ is drawn at line $31$ and compared
-at line $36$ with the index $j$ such that $\QT[j] = u^*$.
+Bookkeeping is added: an index $\fpguess \sample \set{1 \until \numRO+1}$ is drawn at line~\ref{gm:init-fp} and compared at line \ref{gm:fin-check-j} with the smallest index $j$ such that $\QT[j] = u^*$.
 
-The index $\fpguess$ is drawn before both early rejections, hence on every run,
-and it is used neither in the answers to the queries of $\adv$ nor in the
-computation of the output. So the whole run of $\adv$ is independent of
-$\fpguess$, and on the event that the game outputs $1$ the procedure reaches
-line $36$, whence $\goodev_4$ holds if and only if $j = \fpguess$. This is
-where the factor $\numRO + 1$ enters.
+The index $\fpguess$ is drawn before both early rejections, hence on every run, and it is used neither in the answers to the queries of $\adv$ nor in the computation of the output.
+Consequently the whole run of $\adv$ is independent of $\fpguess$, and hence so are both the event $\set{\tfgamename{gameops}{G4}^\adv \Rightarrow 1}$ and the index $j$.
+In particular for any run of $\tfgamename{gameops}{G4}$ that outputs $1$ any of the $\numRO +1$ shifted combination of $j,\fpguess$ is equally likely.
+By line~\ref{gm:fin-check-j} $\goodev_4$ holds if and only if $j = \fpguess$.
+Putting all this together gives
+\begin{equation}\label{eq:g3g4}
+    \begin{aligned}
+        \Pr[\tfgamename{gameops}{G3}^\adv \Rightarrow 1]
+            &= \Pr[\tfgamename{gameops}{G4}^\adv \Rightarrow 1]
+            = (\numRO+1)\cdot
+            \Pr[\tfgamename{gameops}{G4}^\adv \Rightarrow 1 \wedge j = \fpguess] 
+            \\
+            &= (\numRO+1)\cdot
+            \Pr[\tfgamename{gameops}{G4}^\adv \Rightarrow 1 \wedge \goodev_4].
+    \end{aligned}
+\end{equation}
 
-The factorised form $\Pr[\bG \Rightarrow 1 \wedge \goodev] =
-\Pr[\bG \Rightarrow 1] \cdot \Pr[\goodev]$ is \emph{not} available here:
-because of the early rejections at lines $32$ and $35$, which have no
-counterpart in the original argument, $\badev$ is also left unset on runs that
-reject early, so $\Pr[\goodev_4] > 1/(\numRO+1)$.
+    % Note that \eqref{eq:g3g4} must be phrased through the joint event, and
+    % \emph{not} in the factorised form $\Pr[\bG \Rightarrow 1 \wedge \goodev] =
+    % \Pr[\bG \Rightarrow 1]\cdot\Pr[\goodev]$ used in~\cite{EC:AABN02}: because of
+    % the early rejections at lines \ref{gm:fin-check-msg} and \ref{gm:fin-check-chal}, which have no counterpart there,
+    % the flag $\badev$ is also left unset on runs that reject early, so
+    % $\Pr[\goodev_4] > 1/(\numRO+1)$.

@@ -8,84 +8,11 @@
 \REDACTfalse
 \PUBLISHfalse
 
-\ifPUBLISH
-\else
-% For easier reading on screens
-% Content is kept the same, only margins are smaller and font bolder
-% Remove for publication & review submission
-% \usepackage{mlmodern}
-% \usepackage[c5paper, centering, textwidth=12.2cm, textheight=19.3cm, headsep=25pt, footskip=30pt,]{geometry}
-\usepackage[a4paper, centering, textwidth=17.2cm, textheight=26.3cm, headsep=15pt, footskip=10pt,]{geometry}
-\fi
-
-% Packages & Configurations {{{{{
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Standard maths packages
-\usepackage{amsmath}
-\usepackage{amscd}
-\usepackage{amsfonts}
-\usepackage{amssymb}
 \usepackage{games}
-
-% Create the \cites command, without requiring biblatex support
-% https://tex.stackexchange.com/a/537201
-% Modified to _not_ include nbsp between entries [key, ref;<nbsp>key, ref]
-\usepackage{cite}
-\usepackage{cite}
-\makeatletter
-\newcommand{\citecomment}[2][]{\citen{#2}#1\citevar}
-\newcommand{\citeone}[1]{\citecomment{#1}}
-\newcommand{\citetwo}[2][]{\citecomment[,~#1]{#2}}
-\newcommand{\citevar}{\@ifnextchar\bgroup{; \citeone}{\@ifnextchar[{; \citetwo}{]}}}
-\newcommand{\citefirst}{\@ifnextchar\bgroup{\citeone}{\@ifnextchar[{\citetwo}{]}}}
-\newcommand{\cites}{[\citefirst}
-\makeatother
-
-% Using bookmarksdepth creates table of contents in pdf metadata
-\usepackage[
-  colorlinks=true,
-  allcolors=blue,
-  unicode,
-  bookmarksdepth=3
-]{hyperref}
-\usepackage{cleveref}
-
-% Enumitem - Control layout of itemize, enumerate, description
-% Provides: enumerate and itemize environments
-% https://www.ctan.org/pkg/enumitem
-% \usepackage[shortlabels]{enumitem}
-% Spacing around enumerate/itemize
-% \setlist[enumerate]{noitemsep, topsep=0.8ex}
-% \setlist[itemize]{noitemsep, nosep}
-
-% Mathtools - Mathematical tools to use with amsmath
-% Must be loaded _before_ unicode-math
-% Provides: \hookrightarrow, ...
-% https://www.ctan.org/pkg/mathtools
-\usepackage{mathtools}
-
-\usepackage{tikz}
-\usetikzlibrary{angles,arrows,calc,decorations.pathmorphing,matrix,shapes}
-
-% Create commutative diagrams with TikZ
-% https://ctan.org/pkg/tikz-cd
-\usepackage{tikz-cd}
-\tikzcdset{%
-  ampersand replacement=\&,
-  % /tikz/commutative diagrams/arrows={thick},
-}
-
-%%---- Cryptocode
-\usepackage[]{cryptocode/cryptocode}
-
 %%---- TeXFrog: game-hopping pseudocode (see report/gameops/)
-%% texfrog-compat must be loaded first: it back-ports the e-type expl3
-%% argument variants that texfrog.sty needs but TeX Live 2023 lacks.
-\usepackage{gameops/texfrog-compat}
-\usepackage[package=cryptocode]{gameops/texfrog}
+\usepackage{texfrog}
 
-\usepackage{xspace}
+\input{preamble.tex}
 % }}}}}
 
 % Generic tex Commands {{{{{
@@ -133,6 +60,8 @@
 
 \fi
 % }}}}}
+
+\input{gameops.tex}
 
 % Bibliography {{{{{
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -273,47 +202,46 @@ We expect the odd degree variant to be roughly more efficient when $2 \lambda \l
 % {{{{{
 \section{Updated security proof}
 We then consider an updated security proof, modeled over the framework in~\cite{C:ABDPW25}. 
-In~\cite{C:ABDPW25} the proof strategy is:
-\begin{enumerate}
-    \item Use Lemma 2.2 to pass from EUF-CMA to identification protocol, loss $\numRO $, multiplicative
-    \item Swap the actual commitment distribution for the stationary distribution, with additive loss in $\numOSign$.
-    \item Swap the hint distributions
-\end{enumerate}
-
-Here we propose to swap the reduction order.
-\begin{enumerate}
-    \item Swap the actual commitment distribution for the stationary distribution, with additive loss in $\numOSign$.
-    \item Use Lemma 2.2 to pass from EUF-CMA to identification protocol, loss $\numRO $, multiplicative
-    \item Swap the hint distributions
-\end{enumerate}
-In this way we do not have anymore to combine the multiplicative loss in \numRO by the additive one in \numOSign.
-This swap, however, does not come for free. 
-We have to be careful with swapping the commitment distribution properly, essentially we need to rewrite the proof of Lemma 2.2 (\cite[Lemma~3.5]{EC:AABN02}) to use the hints immediately when simulating the signatures. 
-This will avoid to ``bake'' the multiplicative loss inside the reduction. This can be seen as a refinement of the hint-framework.
-Essentially we need to avoid using Lemma 3.1~\cite{C:ABDPW25} and instead add a game hop in the lemma proof in which we directly swap in the \textbf{Initialize} step. 
-The important step is that this should happen \emph{after} the game hop in which the $\mathsf{bad}$ flag is handled, i.e. between the first and second game.
-Roughly the games should be as follows:
-\begin{games}
-    \game{hintIMPPA} The game for hint-IMP-PA, like Definition 3.5~\cite{C:ABDPW25}. Here the same design idea as in \cite[EC:AABN02] should be used to define the sign and oracle game. The signatures just return hints.
-    \game{Gsim} The game for hint-IMP-PA, but with the simulator using the hints to simulate the transcripts. This 
-    \game{G0} Possibly multiple games that do the same as in games G0,G1,G2 of \cite{EC:AABN02}
-    \game{hvzk} this game hop swap the simulated transcripts with the real ones, using the hints. This should reduce to the hint-hvzk game, or a similar property.
-    \game{minent} Possibly multiple games that do the same as in games G3,G4 of \cite{EC:AABN02} to account for the min-entropy of the commitment distribution.
-    \game{EUFCMA} The final game, which is the EUF-CMA game.
-\end{games}
-
-
-We also plan to use \cite[Proposition 1]{cryptoeprint:2026/1775} to bound the distance.
-
-\include{extended_proof}
-
 
 Contents of the section:
 \begin{enumerate}
+    \item Better reduction, no more vacuous bound.  We also plan to use \cite[Proposition 1]{cryptoeprint:2026/1775} to bound the distance.
     \item Explicit simulator definition
     \item Explicit reduction as in the spec, assuming negligible failure
     \item Reduction for the case in which there are non-negligible failures
 \end{enumerate}
+% In~\cite{C:ABDPW25} the proof strategy is:
+% \begin{enumerate}
+%     \item Use Lemma 2.2 to pass from EUF-CMA to identification protocol, loss $\numRO $, multiplicative
+%     \item Swap the actual commitment distribution for the stationary distribution, with additive loss in $\numOSign$.
+%     \item Swap the hint distributions
+% \end{enumerate}
+%
+% Here we propose to swap the reduction order.
+% \begin{enumerate}
+%     \item Swap the actual commitment distribution for the stationary distribution, with additive loss in $\numOSign$.
+%     \item Use Lemma 2.2 to pass from EUF-CMA to identification protocol, loss $\numRO $, multiplicative
+%     \item Swap the hint distributions
+% \end{enumerate}
+% In this way we do not have anymore to combine the multiplicative loss in \numRO by the additive one in \numOSign.
+% This swap, however, does not come for free. 
+% We have to be careful with swapping the commitment distribution properly, essentially we need to rewrite the proof of Lemma 2.2 (\cite[Lemma~3.5]{EC:AABN02}) to use the hints immediately when simulating the signatures. 
+% This will avoid to ``bake'' the multiplicative loss inside the reduction. This can be seen as a refinement of the hint-framework.
+% Essentially we need to avoid using Lemma 3.1~\cite{C:ABDPW25} and instead add a game hop in the lemma proof in which we directly swap in the \textbf{Initialize} step. 
+% The important step is that this should happen \emph{after} the game hop in which the $\mathsf{bad}$ flag is handled, i.e. between the first and second game.
+% Roughly the games should be as follows:
+% \begin{games}
+%     \game{hintIMPPA} The game for hint-IMP-PA, like Definition 3.5~\cite{C:ABDPW25}. Here the same design idea as in \cite[EC:AABN02] should be used to define the sign and oracle game. The signatures just return hints.
+%     \game{Gsim} The game for hint-IMP-PA, but with the simulator using the hints to simulate the transcripts. This 
+%     \game{G0} Possibly multiple games that do the same as in games G0,G1,G2 of \cite{EC:AABN02}
+%     \game{hvzk} this game hop swap the simulated transcripts with the real ones, using the hints. This should reduce to the hint-hvzk game, or a similar property.
+%     \game{minent} Possibly multiple games that do the same as in games G3,G4 of \cite{EC:AABN02} to account for the min-entropy of the commitment distribution.
+%     \game{EUFCMA} The final game, which is the EUF-CMA game.
+% \end{games}
+
+\input{extended_proof}
+
+
 
 
 

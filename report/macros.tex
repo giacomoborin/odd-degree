@@ -1,25 +1,14 @@
-% Comments
-% \newcommand{\AL}[1]{\textcolor{new green}{Antonin:#1}}
-% \newcommand{\AB}[1]{\textcolor{red}{#1}}
-% \newcommand{\PAD}[1]{\textcolor{blue}{Pierrick: #1}}
-% \newcommand{\MCRS}[1]{\textcolor{red}{Maria: #1}}
-% \newcommand{\marzio}[1]{\textcolor{violet}{Marzio: #1}}
-% \newcommand{\ric}[1]{\textcolor{orange}{Riccardo #1}}
-% \newcommand{\BF}[1]{\textcolor{magenta}{Boris: #1}}
-% \newcommand{\lrnz}[1]{\textcolor{cyan}{Lorenz: #1}}
-% \newcommand{\MaxD}[1]{\textcolor{olive}{Max: #1}}
-% \newcommand{\aw}[1]{\textcolor{clr}{Alex: #1}}
-
-\newcommand{\AL}[1]{}
-\newcommand{\AB}[1]{}
-\newcommand{\PAD}[1]{}
-\newcommand{\MCRS}[1]{}
-\newcommand{\marzio}[1]{}
-\newcommand{\ric}[1]{}
-\newcommand{\BF}[1]{}
-\newcommand{\lrnz}[1]{}
-\newcommand{\MaxD}[1]{}
-\newcommand{\aw}[1]{}
+% MathJax's TeX input processor does not implement \ensuremath (it is a
+% LaTeX2e kernel command, absent from MathJax's supported-macro list), so
+% the HTML viewer's client-side macro block -- built by scraping this file's
+% \newcommand/\providecommand/... lines for MathJax -- fails on every macro
+% below that is defined via \ensuremath{...} (which is most of them).
+% \providecommand is a no-op under real pdflatex (where \ensuremath already
+% exists as the kernel command) and supplies MathJax's missing one, since
+% everywhere it is invoked from these macros is already math content.
+\providecommand{\ensuremath}[1]{#1}
+% Same story for \xspace (the xppace package's command): MathJax doesn't
+% implement it either, and it's used throughout the macros below.
 
 \newcommand{\jump}{\vspace{12pt}}
 \renewcommand{\phi}{\varphi}
@@ -331,3 +320,77 @@
 \renewcommand{\frac}[2]{\mathchoice{\defaultfrac{#1}{#2}}{#1/#2}{#1/#2}{#1/#2}}
 
 
+\newcommand{\badprog}{\ensuremath{\mathsf{bad}_\mathsf{prog}}}
+
+% --- Specific to this section -----------------------------------------
+\newcommand{\RO}{\ensuremath{\mathsf{RO}}}
+\newcommand{\OSign}{\ensuremath{\mathsf{OSign}}}
+\newcommand{\OTrans}{\ensuremath{\mathsf{OTrans}}}
+\newcommand{\HT}{\ensuremath{\mathsf{HT}}}
+\newcommand{\QT}{\ensuremath{\mathsf{QT}}}
+\newcommand{\SIG}{\ensuremath{\mathsf{SIG}}}
+\newcommand{\Prover}{\ensuremath{\mathcal{P}}}
+\newcommand{\Verif}{\ensuremath{\mathcal{V}}}
+\newcommand{\Real}{\ensuremath{\mathsf{Real}}}
+\newcommand{\HintSim}{\ensuremath{\mathsf{HintSim}}}
+\newcommand{\badev}{\ensuremath{\mathsf{bad}}}
+\newcommand{\goodev}{\ensuremath{\mathsf{Good}}}
+\newcommand{\fpguess}{\ensuremath{\mathsf{fp}}}
+\newcommand{\hctr}{\ensuremath{\mathsf{hc}}}
+\newcommand{\sctr}{\ensuremath{\mathsf{sc}}}
+\newcommand{\Qset}{\ensuremath{\mathcal{Q}}}
+\newcommand{\hintimppaadv}[4]{%
+  \ensuremath{\Advantage{\mathsf{hint}\text{-}\mathsf{IMP}\text{-}\mathsf{PA}}{#1,#2}(#3,#4)}}
+\newcommand{\minentropy}[1]{\ensuremath{\mathsf{MinEnt}(#1)}}
+
+
+% --- Macros cryptocode itself claims -----------------------------------
+% The TeXFrog HTML wrapper loads cryptocode with the option set
+%   [n,advantage,operators,sets,adversary,landau,probability,notions,logic,
+%    ff,mm,primitives,events,complexity,oracles,asymptotics,keys]
+% which defines \sig, \pk, \adv, \bdv, \ddv, \set, \concat, \sample, \abs and
+% \minentropy itself.  A plain \providecommand would therefore be a no-op in
+% the HTML build and the browser would disagree with the paper (cryptocode's
+% \sig, for instance, is \mathsf{Sig}, not the signature variable we want).
+% These ten are consequently defined unconditionally.  The values are exactly
+% those of report/macros.tex, so re-running this inside the paper changes
+% nothing there.
+\providecommand{\pk}{}\renewcommand{\pk}{\textsf{pk}}
+\providecommand{\adv}{}\renewcommand{\adv}{\mathcal{A}}
+\providecommand{\bdv}{}\renewcommand{\bdv}{\mathcal{B}}
+\providecommand{\ddv}{}\renewcommand{\ddv}{\mathcal{D}}
+\providecommand{\sig}{}\renewcommand{\sig}{\ensuremath{\mathsf{sig}}}
+\providecommand{\concat}{}\renewcommand{\concat}{\mathrel{||}}
+\providecommand{\sample}{}\renewcommand{\sample}{%
+  \gets\mathllap{\vcenter{\hbox{\tiny\rmfamily\upshape\$}}}\;}
+\providecommand{\set}[1]{}\renewcommand{\set}[1]{\left\{#1\right\}}
+\providecommand{\abs}[1]{}\renewcommand{\abs}[1]{\ensuremath{\lvert #1 \rvert}}
+
+
+% Automatic line numbering and cross-references.
+%
+% Numbering itself is cryptocode's own (each \procedure below is given the
+% `linenumbering` key); what needs setting up here is only the *reference*
+% side.  cryptocode's line-number column is produced by \pcln, which does
+% \refstepcounter{pclinenumber} before typesetting the number -- so a
+% \label placed as the first token of a pseudocode line's content lands
+% right after that \refstepcounter and captures the number just assigned
+% to that line.  \gline{name} is that label call; a citation elsewhere in
+% the paper then just writes \ref{name} and is correct by construction,
+% even if lines are later added, removed or reordered.
+%
+% (cryptocode already makes this safe to do inside a \procedure box: it
+% locally redefines \label so that it is a no-op during the box's internal
+% width-measuring pass and only fires for real once, on the pass that
+% actually draws the box.)
+%
+% \gline is a \providecommand guarded by \ifgamelabels so that a
+% consumer which renders the same tagged source more than once in one
+% document (e.g. gameops/standalone.tex, which shows both per-game diffs
+% and a consolidated figure) can set \gamelabelsfalse to avoid re-defining
+% the same labels several times over. The paper itself renders the source
+% exactly once (a single consolidated \tfrenderfigure), so it leaves
+% \ifgamelabels at its default of true.
+\newif\ifgamelabels
+\gamelabelstrue
+\providecommand{\gline}[1]{\ifgamelabels\label{#1}\fi}
